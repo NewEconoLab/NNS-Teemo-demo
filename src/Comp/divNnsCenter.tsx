@@ -53,7 +53,7 @@ class DivNnsCenter extends React.Component<IProps,any> {
     butGetInvokeReadClick = async (e:any) => {
         invokeGetOwnerInfo.arguments[0].value = await this.NNSh.namehash(this.state.inputValue)
 
-        var nnsOwnerInfoData:InvokeScriptResp = await Teemmo.NEO.invokeRead(JSON.parse(JSON.stringify(invokeGetOwnerInfo)) as InvokeReadInput)
+        var nnsOwnerInfoData:InvokeScriptResp = await Teemo.NEO.invokeRead(JSON.parse(JSON.stringify(invokeGetOwnerInfo)) as InvokeReadInput)
         var stack0:any = nnsOwnerInfoData.stack[0].value;
         console.log(nnsOwnerInfoData)
         var nnsOwnerInfo:OwnerInfo = {

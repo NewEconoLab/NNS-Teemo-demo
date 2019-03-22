@@ -35,7 +35,7 @@ class NNSHelper {
         }
         //console.log(invokeRead_nameHashArray)
         //console.log(JSON.stringify(invokeRead_nameHashArray))
-        var invokeResp:InvokeScriptResp = await Teemmo.NEO.invokeRead(JSON.parse(JSON.stringify(invokeRead_nameHashArray)) as InvokeReadInput)
+        var invokeResp:InvokeScriptResp = await Teemo.NEO.invokeRead(JSON.parse(JSON.stringify(invokeRead_nameHashArray)) as InvokeReadInput)
         //console.log(invokeResp)
         namehash = invokeResp.stack[0].value
 

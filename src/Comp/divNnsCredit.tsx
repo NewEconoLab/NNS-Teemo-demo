@@ -79,7 +79,7 @@ class DivNnsCredit extends React.Component<IProps,any> {
         invokeRead_credit.arguments[0].value =  this.state.inputValueAddr//await this.NNSh.namehash(this.state.inputValue)
 
         //console.log(invokeRead_resolve)
-        var creditData:InvokeScriptResp = await Teemmo.NEO.invokeRead(JSON.parse(JSON.stringify(invokeRead_credit)) as InvokeReadInput)       
+        var creditData:InvokeScriptResp = await Teemo.NEO.invokeRead(JSON.parse(JSON.stringify(invokeRead_credit)) as InvokeReadInput)       
         //console.log(creditData);
 
         var stack0:any = creditData.stack[0].value;
@@ -102,7 +102,7 @@ class DivNnsCredit extends React.Component<IProps,any> {
             ((invoke_credit_authenticate.arguments as Argument[])[1].value as Argument[]).push({type:"String",value:str});
         }
 
-        var invokeCreditAuthenticateResp:InvokeOutput = await Teemmo.NEO.invoke(JSON.parse(JSON.stringify(invoke_credit_authenticate)) as InvokeArgs)
+        var invokeCreditAuthenticateResp:InvokeOutput = await Teemo.NEO.invoke(JSON.parse(JSON.stringify(invoke_credit_authenticate)) as InvokeArgs)
 
         this.setState({
             resData:JSON.stringify(invokeCreditAuthenticateResp, null, 2)                                 
@@ -112,7 +112,7 @@ class DivNnsCredit extends React.Component<IProps,any> {
     butInvokeCreditRevokeClick = async(e:any) => {
         invoke_credit_revoke.arguments[0].value = this.state.inputValueAddr
 
-        var invokeCreditRevokeResp:InvokeOutput = await Teemmo.NEO.invoke(JSON.parse(JSON.stringify(invoke_credit_revoke)) as InvokeArgs)
+        var invokeCreditRevokeResp:InvokeOutput = await Teemo.NEO.invoke(JSON.parse(JSON.stringify(invoke_credit_revoke)) as InvokeArgs)
 
         this.setState({
             resData:JSON.stringify(invokeCreditRevokeResp, null, 2)                                 

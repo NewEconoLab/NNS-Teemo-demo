@@ -34,10 +34,10 @@ class App extends Component {
   init=()=>{
     //console.log("this is init");
     
-    window.addEventListener('Teemmo.NEO.READY',async (data)=>{
+    window.addEventListener('Teemo.NEO.READY',async (data)=>{
       console.log("inject READY ");
       this.setState({
-        address: (await Teemmo.NEO.getAccount()).address                       
+        address: (await Teemo.NEO.getAccount()).address                       
       });  
       //console.log(JSON.stringify(data.detail))
     })

@@ -17,3 +17,11 @@ yarn start
 ```
 
 http://localhost:3000/
+
+## build
+
+```
+yarn build
+```
+
+/build

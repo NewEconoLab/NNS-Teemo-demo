@@ -47,7 +47,7 @@ class DivNnsResolver extends React.Component<IProps,any> {
         invokeRead_resolve.arguments[1].value = await this.NNSh.namehash(this.state.inputValue)
 
         //console.log(invokeRead_resolve)
-        var resolverData:InvokeScriptResp = await Teemmo.NEO.invokeRead(JSON.parse(JSON.stringify(invokeRead_resolve)) as InvokeReadInput)       
+        var resolverData:InvokeScriptResp = await Teemo.NEO.invokeRead(JSON.parse(JSON.stringify(invokeRead_resolve)) as InvokeReadInput)       
         //console.log(resolverData);
 
         this.setState({
