@@ -62,7 +62,7 @@ class App extends Component {
       div_main = <DivNnsResolver title="NNS Resolver" scriptHash={scriptHash} />
     }
     else if (this.state.menuID == 4) {
-      div_main = <DivNnsCredit title="NNS Credit" scriptHash={scriptHash} />
+      div_main = <DivNnsCredit title="NNS Credit" address={this.state.address}  scriptHash={scriptHash} />
     }
     else {
       div_main = div_defult()

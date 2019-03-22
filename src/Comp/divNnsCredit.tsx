@@ -7,6 +7,7 @@ import NNSHelper from '../Tools/nnsHelper'
 
 interface IProps{
     title:string
+    address:string
     scriptHash:any
 }
 
@@ -65,7 +66,7 @@ class DivNnsCredit extends React.Component<IProps,any> {
 
     state = {
         resData : '{}',
-        inputValueAddr : 'ASBhJFN3XiDu38EdEQyMY3N2XwGh1gd5WW',
+        inputValueAddr : this.props.address,
         inputValueNns : 'qmz.test'
     }  
 
