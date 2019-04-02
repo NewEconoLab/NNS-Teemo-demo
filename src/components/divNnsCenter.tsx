@@ -67,7 +67,8 @@ class DivNnsCenter extends React.Component<IProps,any> {
             root:stack0[7].value,
         }
         nnsOwnerInfo.domain = NeoHelper.hex2a(nnsOwnerInfo.domain)
-        nnsOwnerInfo.TTL = NeoHelper.timetrans(parseInt(NeoHelper.byte2Hex(NeoHelper.hex2Byte(nnsOwnerInfo.TTL).reverse()), 16))
+        nnsOwnerInfo.TTL = NeoHelper.hex2TimeStr(nnsOwnerInfo.TTL)
+        nnsOwnerInfo.owner = await Teemo.NEO.getAddressFromScriptHash(NeoHelper.byte2Hex(NeoHelper.hex2Byte(nnsOwnerInfo.owner).reverse()))
         this.setState({
             resData: JSON.stringify(nnsOwnerInfo, null, 2)                                 
         });

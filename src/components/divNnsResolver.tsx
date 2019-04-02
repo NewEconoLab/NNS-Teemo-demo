@@ -66,7 +66,7 @@ class DivNnsResolver extends React.Component<IProps,any> {
         <>
             <p>{this.props.title}</p>
             <Input placeholder="输入要查询的NSS域名" onChange={this.handelChange.bind(this)} defaultValue={this.state.inputValue}/>
-            <Button onClick={this.butGetInvokeReadClick} type="primary">获取NNS所有者信息</Button>
+            <Button onClick={this.butGetInvokeReadClick} type="primary">解析NNS</Button>
             <pre>{this.state.resData}</pre>
         </>
         )    
