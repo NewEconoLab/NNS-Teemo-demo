@@ -5,8 +5,13 @@ class NeoHelper {
         //根据合约notify输出的scripthash，转换为NEO地址
     }
 
-    public static getBlock = async (blockIndex:number) =>{
-      let result = await fetch('http://test.nel.group:20332?jsonrpc=2.0&method=getblock&params=[' + blockIndex +',1]&id=1', {
+    store:any
+    constructor(store:any){
+        this.store=store
+    }
+
+    public getBlock = async (blockIndex:number) =>{
+      let result = await fetch(this.store.rpcUrl + '?jsonrpc=2.0&method=getblock&params=[' + blockIndex +',1]&id=1', {
         // method: 'post',
         // headers: {
         //   'user-agent': 'Mozilla/4.0 MDN Example',

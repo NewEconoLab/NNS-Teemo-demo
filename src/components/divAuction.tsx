@@ -38,167 +38,9 @@ interface InvokeScriptResp{
     stack: InvokeScriptRespStack[]
 }
 
-let invokeRead_CGAS_getBanlance =  {
-    "scriptHash": "",
-    "operation": "balanceOf",
-    "arguments": [
-        {"type":"Address","value":""}
-    ],
-    "network": "TestNet"
-}
-
-let invokeRead_auction_getBanlance =  {
-    "scriptHash": "",
-    "operation": "balanceOf",
-    "arguments": [
-        {"type":"Address","value":""}
-    ],
-    "network": "TestNet"
-}
-
-let invokeRead_auction_getAuctionState =  {
-    "scriptHash": "",
-    "operation": "getAuctionStateByFullhash",
-    "arguments": [
-        {"type":"ByteArray","value":""}
-    ],
-    "network": "TestNet"
-}
-
-let invokeRead_auction_getBalanceOfBid =  {
-    "scriptHash": "",
-    "operation": "balanceOfBid",
-    "arguments": [
-        {"type":"Address","value":""},
-        {"type":"ByteArray","value":""}
-    ],
-    "network": "TestNet"
-}
-
-let invoke_CGAS_doCGASinStep0 =  {
-    "scriptHash": "",
-    "operation": "transfer",
-    "arguments": [
-        {"type":"Address","value":""},
-        {"type":"Address","value":""},
-        {"type":"Integer","value":0}
-    ],
-    "fee":"0",
-    "description":"NNS竞拍充值CGAS转账",
-    "network": "TestNet"
-}
-
-let invoke_auction_doCGASinStep1 =  {
-    "scriptHash": "",
-    "operation": "setmoneyin",
-    "arguments": [
-        {"type":"Hook_Txid","value":0}
-    ],
-    "fee":"0",
-    "description":"NNS竞拍充值确认",
-    "network": "TestNet"
-}
-
-let invoke_auction_doCGASout =  {
-    "scriptHash": "",
-    "operation": "getmoneyback",
-    "arguments": [
-        {"type":"Address","value":""},
-        {"type":"Integer","value":0}
-    ],
-    "fee":"0",
-    "description":"NNS竞拍CGAS提取",
-    "network": "TestNet"
-}
-
-let invoke_auction_doStartAuction =  {
-    "scriptHash": "",
-    "operation": "startAuction",
-    "arguments": [
-        {"type":"Address","value":""},
-        {"type":"ByteArray","value":""},
-        {"type":"String","value":""}
-    ],
-    "fee":"0",
-    "description":"NNS竞拍开标",
-    "network": "TestNet"
-}
-
-let invoke_auction_doBid =  {
-    "scriptHash": "",
-    "operation": "raise",
-    "arguments": [
-        {"type":"Address","value":""},
-        {"type":"ByteArray","value":""},
-        {"type":"Integer","value":0}
-    ],
-    "fee":"0",
-    "description":"NNS竞拍加价",
-    "network": "TestNet"
-}
-
-let invoke_auction_doBidSettlement =  {
-    "scriptHash": "",
-    "operation": "bidSettlement",
-    "arguments": [
-        {"type":"Address","value":""},
-        {"type":"ByteArray","value":""}
-    ],
-    "fee":"0",
-    "description":"NNS竞拍域名领取",
-    "network": "TestNet"
-}
-
-let invoke_auction_doCollect =  {
-    "scriptHash": "",
-    "operation": "collectDomain",
-    "arguments": [
-        {"type":"Address","value":""},
-        {"type":"ByteArray","value":""}
-    ],
-    "fee":"0",
-    "description":"NNS竞拍域名领取",
-    "network": "TestNet"
-}
-
-let invoke_auction_doRenew =  {
-    "scriptHash": "",
-    "operation": "renewDomain",
-    "arguments": [
-        {"type":"Address","value":""},
-        {"type":"ByteArray","value":""},
-        {"type":"String","value":""}
-    ],
-    "fee":"0",
-    "description":"NNS域名续期",
-    "network": "TestNet"
-}
-
-let invoke_credit_authenticate =  {
-    "scriptHash": "",
-    "operation": "authenticate",
-    "arguments": [
-        {"type":"Address","value":""},
-        {"type":"Array","value":[]}
-    ],
-    "fee":"0",
-    "description":"NNS反向解析绑定",
-    "network": "TestNet"
-}
-
-let invoke_credit_revoke =  {
-    "scriptHash": "",
-    "operation": "revoke",
-    "arguments": [
-        {"type":"Address","value":""},
-    ],
-    "fee":"0",
-    "description":"NNS反向解析解绑",
-    "network": "TestNet"
-}
-
 class DivAuction extends React.Component<any,any> {
-    NNSh = new NNSHelper(this.props.store.scriptHash);
+    //NNSh = new NNSHelper(this.props.store);
+    //NEOh = new NeoHelper(this.props.store);  
 
     state = {
         resDataRead : '{}',
@@ -229,18 +71,6 @@ class DivAuction extends React.Component<any,any> {
 
     intervalID:any
     componentDidMount(){
-        invokeRead_CGAS_getBanlance.scriptHash = this.props.store.scriptHash.NEP_5_CGAS
-        invokeRead_auction_getBanlance.scriptHash = this.props.store.scriptHash.nns_auction
-        invoke_CGAS_doCGASinStep0.scriptHash = this.props.store.scriptHash.NEP_5_CGAS
-        invoke_auction_doCGASinStep1.scriptHash = this.props.store.scriptHash.nns_auction
-        invoke_auction_doCGASout.scriptHash = this.props.store.scriptHash.nns_auction
-        invokeRead_auction_getAuctionState.scriptHash = this.props.store.scriptHash.nns_auction
-        invoke_auction_doStartAuction.scriptHash = this.props.store.scriptHash.nns_auction
-        invoke_auction_doBid.scriptHash = this.props.store.scriptHash.nns_auction
-        invokeRead_auction_getBalanceOfBid.scriptHash = this.props.store.scriptHash.nns_auction
-        invoke_auction_doBidSettlement.scriptHash = this.props.store.scriptHash.nns_auction
-        invoke_auction_doCollect.scriptHash = this.props.store.scriptHash.nns_auction
-        invoke_auction_doRenew.scriptHash = this.props.store.scriptHash.nns_auction
 
         this.intervalID = setInterval(async ()=>{
             this.setState({
@@ -284,16 +114,50 @@ class DivAuction extends React.Component<any,any> {
     }
 
     calcAuctionDay =async (blockIndex:number) =>{
-        var startTimeS = (await NeoHelper.getBlock(blockIndex)).result.time as number
+        var startTimeS = (await new NeoHelper(this.props.store).getBlock(blockIndex)).result.time as number
         return  (new Date().getTime()/1000 - startTimeS)/ 60 / 5  //5分钟1天
     }
 
     getInvokeRead_getBanlance = async () =>{
-        invokeRead_CGAS_getBanlance.arguments[0].value =  this.props.store.address//await this.NNSh.namehash(this.state.inputValue)
+        let invokeRead_CGAS_getBanlance =  {
+            "scriptHash": this.props.store.scriptHash.NEP_5_CGAS,
+            "operation": "balanceOf",
+            "arguments": [
+                {"type":"Address","value":this.props.store.address}
+            ],
+            "network": this.props.store.network
+        }
+        let invokeRead_auction_getBanlance =  {
+            "scriptHash": this.props.store.scriptHash.nns_auction,
+            "operation": "balanceOf",
+            "arguments": [
+                {"type":"Address","value":this.props.store.address}
+            ],
+            "network": this.props.store.network
+        }       
+        let invokeRead_auction_getAuctionState =  {
+            "scriptHash": this.props.store.scriptHash.nns_auction,
+            "operation": "getAuctionStateByFullhash",
+            "arguments": [
+                {"type":"ByteArray","value":await new NNSHelper(this.props.store).namehash(this.props.store.nns)}
+            ],
+            "network": this.props.store.network
+        }        
+        let invokeRead_auction_getBalanceOfBid =  {
+            "scriptHash": this.props.store.scriptHash.nns_auction,
+            "operation": "balanceOfBid",
+            "arguments": [
+                {"type":"Address","value":this.props.store.address},
+                {"type":"ByteArray","value":""}
+            ],
+            "network": this.props.store.network
+        }
 
-        invokeRead_auction_getBanlance.arguments[0].value =  this.props.store.address
+        // invokeRead_CGAS_getBanlance.arguments[0].value =  this.props.store.address//await this.NNSh.namehash(this.state.inputValue)
 
-        invokeRead_auction_getAuctionState.arguments[0].value = await this.NNSh.namehash(this.props.store.nns)
+        // this.invokeRead_auction_getBanlance.arguments[0].value =  this.props.store.address
+
+        //this.invokeRead_auction_getAuctionState.arguments[0].value = await new NNSHelper(this.props.store).namehash(this.props.store.nns)
 
         //console.log(invokeRead_resolve)
         var InvokeReadGroupInput = {group:[{}]}
@@ -302,56 +166,67 @@ class DivAuction extends React.Component<any,any> {
         InvokeReadGroupInput.group.push(invokeRead_auction_getBanlance)
         InvokeReadGroupInput.group.push(invokeRead_auction_getAuctionState)
         
-        //console.log(JSON.stringify(InvokeReadGroupInput));
+        //console.log(JSON.stringify(InvokeReadGroupInput,null,2));
         
         var resData:InvokeScriptResp = await Teemo.NEO.invokeReadGroup(JSON.parse(JSON.stringify(InvokeReadGroupInput)) as InvokeReadGroup)       
         //console.log(resData.stack[3].value);
         //console.log(resData)
 
-        var stack2:any = resData.stack[2].value;
-        //console.log(stack2)
+        if(resData.stack[0] != null){
+            //console.log('stack',resData.stack)
+            var stack2:any = resData.stack[2].value;
+            //console.log('stack2',stack2)
 
-        var AuctionStateInfo:AuctionState = {
-            id:stack2[0].value, //拍卖id,就是拍卖生成的auctionid
-            auctionStarter:stack2[1].value,//域名开拍的人
-            parenthash:stack2[2].value,//拍卖内容
-            domain:stack2[3].value,//拍卖内容
-            domainTTL:stack2[4].value,//域名的TTL,用这个信息来判断域名是否发生了变化
-            startBlockSelling:stack2[5].value,//开始销售块
-            endBlock:stack2[6].value,//结束块
-            maxPrice:stack2[7].value,//最高出价
-            maxBuyer:stack2[8].value,//最大出价者
-            lastBlock:stack2[9].value//最后出价块
+            var AuctionStateInfo:AuctionState = {
+                id:stack2[0].value, //拍卖id,就是拍卖生成的auctionid
+                auctionStarter:stack2[1].value,//域名开拍的人
+                parenthash:stack2[2].value,//拍卖内容
+                domain:stack2[3].value,//拍卖内容
+                domainTTL:stack2[4].value,//域名的TTL,用这个信息来判断域名是否发生了变化
+                startBlockSelling:stack2[5].value,//开始销售块
+                endBlock:stack2[6].value,//结束块
+                maxPrice:stack2[7].value,//最高出价
+                maxBuyer:stack2[8].value,//最大出价者
+                lastBlock:stack2[9].value//最后出价块
+            }
+            AuctionStateInfo.auctionStarter = await Teemo.NEO.getAddressFromScriptHash(NeoHelper.hexReverse(AuctionStateInfo.auctionStarter))
+            AuctionStateInfo.domain = NeoHelper.hex2a(AuctionStateInfo.domain)
+            AuctionStateInfo.domainTTL = NeoHelper.hex2TimeStr(AuctionStateInfo.domainTTL)
+            AuctionStateInfo.maxPrice = AuctionStateInfo.maxPrice/10**8
+            if(AuctionStateInfo.maxBuyer != ''){
+                AuctionStateInfo.maxBuyer = await Teemo.NEO.getAddressFromScriptHash(NeoHelper.hexReverse(AuctionStateInfo.maxBuyer))
+            }      
+
+            //---第二轮invokescript
+
+            // this.invokeRead_auction_getBalanceOfBid.arguments[0].value = this.props.store.address
+            invokeRead_auction_getBalanceOfBid.arguments[1].value = AuctionStateInfo.id
+
+            var resData2:InvokeScriptResp = await Teemo.NEO.invokeRead(JSON.parse(JSON.stringify(invokeRead_auction_getBalanceOfBid)) as InvokeArgs)
+
+            //console.log('AuctionStateInfo',AuctionStateInfo)
+
+            //var CGAS_balacnce = resData.stack[0].value
+            //console.log(NeoHelper.hex2Int(CGAS_balacnce)/10**8)
+
+            this.setState({
+                CGASBalance:NeoHelper.hex2Int(resData.stack[0].value)/10**8,
+                auctionBalance:NeoHelper.hex2Int(resData.stack[1].value)/10**8,
+                bidBalance:NeoHelper.hex2Int(resData2.stack[0].value)/10**8,
+                auctionStateInfo:AuctionStateInfo,
+                auctionDay:await this.calcAuctionDay(AuctionStateInfo.startBlockSelling),
+                resDataRead:JSON.stringify(AuctionStateInfo,null,2),
+                loadingR:false
+            })
         }
-        AuctionStateInfo.auctionStarter = await Teemo.NEO.getAddressFromScriptHash(NeoHelper.hexReverse(AuctionStateInfo.auctionStarter))
-        AuctionStateInfo.domain = NeoHelper.hex2a(AuctionStateInfo.domain)
-        AuctionStateInfo.domainTTL = NeoHelper.hex2TimeStr(AuctionStateInfo.domainTTL)
-        AuctionStateInfo.maxPrice = AuctionStateInfo.maxPrice/10**8
-        if(AuctionStateInfo.maxBuyer != ''){
-            AuctionStateInfo.maxBuyer = await Teemo.NEO.getAddressFromScriptHash(NeoHelper.hexReverse(AuctionStateInfo.maxBuyer))
-        }      
+        else{
+            this.setState({
+                resDataRead:"查询异常",
+                loadingR:false
+            })
+        }
 
-        //---第二轮invokescript
-
-        invokeRead_auction_getBalanceOfBid.arguments[0].value = this.props.store.address
-        invokeRead_auction_getBalanceOfBid.arguments[1].value = AuctionStateInfo.id
-
-        var resData2:InvokeScriptResp = await Teemo.NEO.invokeRead(JSON.parse(JSON.stringify(invokeRead_auction_getBalanceOfBid)) as InvokeArgs)
-
-        //console.log('AuctionStateInfo',AuctionStateInfo)
-
-        //var CGAS_balacnce = resData.stack[0].value
-        //console.log(NeoHelper.hex2Int(CGAS_balacnce)/10**8)
-
-        this.setState({
-            CGASBalance:NeoHelper.hex2Int(resData.stack[0].value)/10**8,
-            auctionBalance:NeoHelper.hex2Int(resData.stack[1].value)/10**8,
-            bidBalance:NeoHelper.hex2Int(resData2.stack[0].value)/10**8,
-            auctionStateInfo:AuctionStateInfo,
-            auctionDay:await this.calcAuctionDay(AuctionStateInfo.startBlockSelling),
-            resDataRead:JSON.stringify(AuctionStateInfo,null,2),
-            loadingR:false
-        })
+        
 
         //console.log(this.state.auctionStateInfo)
     }
@@ -361,9 +236,32 @@ class DivAuction extends React.Component<any,any> {
     }
 
     butInvoke_doCGASin_click = async () =>{
-        invoke_CGAS_doCGASinStep0.arguments[0].value = this.props.store.address
-        invoke_CGAS_doCGASinStep0.arguments[1].value = await Teemo.NEO.getAddressFromScriptHash(this.props.store.scriptHash.nns_auction)
-        invoke_CGAS_doCGASinStep0.arguments[2].value = this.state.CGASopValue * (10**8)
+        let invoke_CGAS_doCGASinStep0 =  {
+            "scriptHash": this.props.store.scriptHash.NEP_5_CGAS,
+            "operation": "transfer",
+            "arguments": [
+                {"type":"Address","value":this.props.store.address},
+                {"type":"Address","value":await Teemo.NEO.getAddressFromScriptHash(this.props.store.scriptHash.nns_auction)},
+                {"type":"Integer","value":this.state.CGASopValue * (10**8)}
+            ],
+            "fee":"0",
+            "description":"NNS竞拍充值CGAS转账",
+            "network": this.props.store.network
+        }
+        let invoke_auction_doCGASinStep1 =  {
+            "scriptHash": this.props.store.scriptHash.nns_auction,
+            "operation": "setmoneyin",
+            "arguments": [
+                {"type":"Hook_Txid","value":0}
+            ],
+            "fee":"0",
+            "description":"NNS竞拍充值确认",
+            "network": this.props.store.network
+        }
+
+        // this.invoke_CGAS_doCGASinStep0.arguments[0].value = this.props.store.address
+        // this.invoke_CGAS_doCGASinStep0.arguments[1].value = await Teemo.NEO.getAddressFromScriptHash(this.props.store.scriptHash.nns_auction)
+        // this.invoke_CGAS_doCGASinStep0.arguments[2].value = this.state.CGASopValue * (10**8)
 
         //console.log(invoke_CGAS_doCGASinStep0)
 
@@ -394,8 +292,20 @@ class DivAuction extends React.Component<any,any> {
     }
 
     butInvoke_doCGASout_click = async () =>{
-        invoke_auction_doCGASout.arguments[0].value = this.props.store.address
-        invoke_auction_doCGASout.arguments[1].value = this.state.CGASopValue * (10**8)
+        let invoke_auction_doCGASout =  {
+            "scriptHash": this.props.store.scriptHash.nns_auction,
+            "operation": "getmoneyback",
+            "arguments": [
+                {"type":"Address","value":this.props.store.address},
+                {"type":"Integer","value":this.state.CGASopValue * (10**8)}
+            ],
+            "fee":"0",
+            "description":"NNS竞拍CGAS提取",
+            "network": this.props.store.network
+        }
+
+        // this.invoke_auction_doCGASout.arguments[0].value = this.props.store.address
+        // this.invoke_auction_doCGASout.arguments[1].value = this.state.CGASopValue * (10**8)
 
         this.setState({
             loadingW:true                                
@@ -413,9 +323,22 @@ class DivAuction extends React.Component<any,any> {
     }
 
     butInvoke_doStartAuction_click = async () =>{
-        invoke_auction_doStartAuction.arguments[0].value = this.props.store.address;
-        invoke_auction_doStartAuction.arguments[1].value = await this.NNSh.namehash(this.props.store.nns.split('.')[1])
-        invoke_auction_doStartAuction.arguments[2].value = this.props.store.nns.split('.')[0]
+        let invoke_auction_doStartAuction =  {
+            "scriptHash": this.props.store.scriptHash.nns_auction,
+            "operation": "startAuction",
+            "arguments": [
+                {"type":"Address","value":this.props.store.address},
+                {"type":"ByteArray","value":await new NNSHelper(this.props.store).namehash(this.props.store.nns.split('.')[1])},
+                {"type":"String","value":this.props.store.nns.split('.')[0]}
+            ],
+            "fee":"0",
+            "description":"NNS竞拍开标",
+            "network": this.props.store.network
+        }
+
+        // this.invoke_auction_doStartAuction.arguments[0].value = this.props.store.address;
+        // this.invoke_auction_doStartAuction.arguments[1].value = await new NNSHelper(this.props.store).namehash(this.props.store.nns.split('.')[1])
+        // this.invoke_auction_doStartAuction.arguments[2].value = this.props.store.nns.split('.')[0]
 
         //console.log(invoke_auction_doStartAuction)
 
@@ -435,9 +358,22 @@ class DivAuction extends React.Component<any,any> {
     }
 
     butInvoke_doBid_click = async() =>{
-        invoke_auction_doBid.arguments[0].value = this.props.store.address;
-        invoke_auction_doBid.arguments[1].value = this.state.auctionStateInfo.id
-        invoke_auction_doBid.arguments[2].value = (this.state.inputAmount*(10**8)).toString()
+        let invoke_auction_doBid =  {
+            "scriptHash": this.props.store.scriptHash.nns_auction,
+            "operation": "raise",
+            "arguments": [
+                {"type":"Address","value":this.props.store.address},
+                {"type":"ByteArray","value":this.state.auctionStateInfo.id},
+                {"type":"Integer","value":(this.state.inputAmount*(10**8)).toString()}
+            ],
+            "fee":"0",
+            "description":"NNS竞拍加价",
+            "network": this.props.store.network
+        }
+
+        // this.invoke_auction_doBid.arguments[0].value = this.props.store.address;
+        // this.invoke_auction_doBid.arguments[1].value = this.state.auctionStateInfo.id
+        // this.invoke_auction_doBid.arguments[2].value = (this.state.inputAmount*(10**8)).toString()
 
         console.log(invoke_auction_doBid)
 
@@ -457,11 +393,33 @@ class DivAuction extends React.Component<any,any> {
     }
 
     butInvoke_doBidSettlementAndCollect_click = async() =>{
-        invoke_auction_doBidSettlement.arguments[0].value = this.props.store.address
-        invoke_auction_doBidSettlement.arguments[1].value = this.state.auctionStateInfo.id
+        let invoke_auction_doBidSettlement =  {
+            "scriptHash": this.props.store.scriptHash.nns_auction,
+            "operation": "bidSettlement",
+            "arguments": [
+                {"type":"Address","value":this.props.store.address},
+                {"type":"ByteArray","value":this.state.auctionStateInfo.id}
+            ],
+            "fee":"0",
+            "description":"NNS竞拍域名领取",
+            "network": this.props.store.network
+        }        
+        let invoke_auction_doCollect =  {
+            "scriptHash": this.props.store.scriptHash.nns_auction,
+            "operation": "collectDomain",
+            "arguments": [
+                {"type":"Address","value":this.props.store.address},
+                {"type":"ByteArray","value":this.state.auctionStateInfo.id}
+            ],
+            "fee":"0",
+            "description":"NNS竞拍域名领取",
+            "network": this.props.store.network
+        }
+        // this.invoke_auction_doBidSettlement.arguments[0].value = this.props.store.address
+        // this.invoke_auction_doBidSettlement.arguments[1].value = this.state.auctionStateInfo.id
 
-        invoke_auction_doCollect.arguments[0].value = this.props.store.address
-        invoke_auction_doCollect.arguments[1].value = this.state.auctionStateInfo.id
+        // this.invoke_auction_doCollect.arguments[0].value = this.props.store.address
+        // this.invoke_auction_doCollect.arguments[1].value = this.state.auctionStateInfo.id
 
         var InvokeGroupInput = {merge:false,group:[{}]}
         InvokeGroupInput.group.pop()
@@ -489,9 +447,22 @@ class DivAuction extends React.Component<any,any> {
     }
 
     butInvoke_doRenew_click = async() =>{
-        invoke_auction_doRenew.arguments[0].value = this.props.store.address
-        invoke_auction_doRenew.arguments[1].value = await this.NNSh.namehash(this.props.store.nns.split('.')[1])
-        invoke_auction_doRenew.arguments[2].value = this.props.store.nns.split('.')[0]
+        let invoke_auction_doRenew =  {
+            "scriptHash": this.props.store.scriptHash.nns_auction,
+            "operation": "renewDomain",
+            "arguments": [
+                {"type":"Address","value":this.props.store.address},
+                {"type":"ByteArray","value":await new NNSHelper(this.props.store).namehash(this.props.store.nns.split('.')[1])},
+                {"type":"String","value":this.props.store.nns.split('.')[0]}
+            ],
+            "fee":"0",
+            "description":"NNS域名续期",
+            "network": this.props.store.network
+        }
+
+        // this.invoke_auction_doRenew.arguments[0].value = this.props.store.address
+        // this.invoke_auction_doRenew.arguments[1].value = await new NNSHelper(this.props.store).namehash(this.props.store.nns.split('.')[1])
+        // this.invoke_auction_doRenew.arguments[2].value = this.props.store.nns.split('.')[0]
 
         console.log(invoke_auction_doRenew)
 
@@ -508,46 +479,6 @@ class DivAuction extends React.Component<any,any> {
             loadingW:false,
             loadingR:true                               
         })
-    }
-
-    butInvokeCreditAuthenticateClick = async(e:any) => {
-        invoke_credit_authenticate.arguments[0].value = this.props.store.address
-        invoke_credit_authenticate.arguments[1].value = []
-        for (const str of this.props.store.nns.split('.').reverse()) {
-            ((invoke_credit_authenticate.arguments as Argument[])[1].value as Argument[]).push({type:"String",value:str});
-        }
-
-        this.setState({
-            loadingW:true                                
-        });
-
-        var invokeCreditAuthenticateResp:InvokeOutput = await Teemo.NEO.invoke(JSON.parse(JSON.stringify(invoke_credit_authenticate)) as InvokeArgs)
-
-        this.props.store.addTxidSended(invokeCreditAuthenticateResp.txid)
-        this.setState({
-            reqDataWrite:JSON.stringify(invoke_credit_authenticate,null,2),
-            resDataWrite:JSON.stringify(invokeCreditAuthenticateResp, null, 2),
-            loadingW:false,
-            loadingR:true                               
-        });
-    }
-
-    butInvokeCreditRevokeClick = async(e:any) => {
-        invoke_credit_revoke.arguments[0].value = this.props.store.address
-
-        this.setState({
-            loadingW:true                                
-        });
-
-        var invokeCreditRevokeResp:InvokeOutput = await Teemo.NEO.invoke(JSON.parse(JSON.stringify(invoke_credit_revoke)) as InvokeArgs)
-
-        this.props.store.addTxidSended(invokeCreditRevokeResp.txid)
-        this.setState({
-            reqDataWrite:JSON.stringify(invoke_credit_revoke,null,2),
-            resDataWrite:JSON.stringify(invokeCreditRevokeResp, null, 2),
-            loadingW:false,
-            loadingR:true                                                                 
-        });
     }
 
     CGASopChange(e:any){
@@ -616,7 +547,7 @@ class DivAuction extends React.Component<any,any> {
             <Divider type="vertical" /> 
             <Button onClick={this.butInvoke_doBidSettlementAndCollect_click}>结算与领取</Button>
             <Divider type="vertical" /> 
-            <Button onClick={this.butInvoke_doRenew_click} disabled={this.state.auctionDay>(365-90)?true:false}>续期{(this.state.auctionDay-(365-90)).toFixed(2)}</Button>             
+            <Button onClick={this.butInvoke_doRenew_click} disabled={this.state.auctionDay>(365-90)?false:true}>续期{(this.state.auctionDay-(365-90)).toFixed(2)}</Button>             
             <Divider />         
             <Spin tip='等待共识中' spinning={this.state.loadingR}>
                 <Row type="flex" align="middle" gutter={16}>

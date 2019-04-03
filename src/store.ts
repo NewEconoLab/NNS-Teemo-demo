@@ -3,6 +3,14 @@ import { notification } from 'antd';
 import NeoHelper from './Tools/neoHelper';
 
 class Store {
+    constructor(){
+        this.init()
+        setInterval(this.updateLastWSmsgSec,1000)
+    }
+
+    @observable isTeemoReady = false
+    @observable isConnected = true
+
     @observable scriptHash = {
         nns_domaincenter : "348387116c4a75e420663277d9c02049907128c7",
         nns_resolver : "6e2aea28af9c5febea0774759b1b76398e3167f1",
@@ -12,7 +20,7 @@ class Store {
         NEP_5_NNC:"fc732edee1efdf968c23c20a9628eaa5a6ccb934"
     }
 
-    @observable network = 'network'
+    @observable network = 'TestNet'
     @observable address:string = 'A**********************'
     @observable nns:string='qmz.test'
     @action public updateAddress = (addr:string) =>{
@@ -24,12 +32,14 @@ class Store {
     @action public updateNNS = (nns:string) =>{
         this.nns = nns
     }
+    @computed get rpcUrl(){
+        if(this.network=='MainNet') return 'http://seed.nel.group:10332'
+        else return 'http://test.nel.group:20332'
+    }
 
-    webSocketURL: string;
-    constructor(webSocketURL:string){
-        this.webSocketURL = webSocketURL
-        setInterval(this.updateLastWSmsgSec,1000)
-        this.socketInit()
+    @computed get webSocketURL(){
+        if(this.network=='MainNet') return 'ws://47.99.35.147:82/ws/mainnet'
+        else return 'ws://47.99.35.147:82/ws/testnet'
     }
 
     updateLastWSmsgSec = () =>{     
@@ -44,7 +54,7 @@ class Store {
             this.socketInit()
         }
 
-        this.socketReadyState = this.socket.readyState
+        if(this.socket) this.socketReadyState = this.socket.readyState
     }
 
     socket: any;
@@ -84,6 +94,10 @@ class Store {
     }
 
     @action socketInit =() =>{
+        if(this.socket){
+            this.socket.close()
+        }
+
         this.blockDatas=[{
             blockHeight:-1,
             blockTime:0,
@@ -104,7 +118,7 @@ class Store {
         this.socket.onopen = (event:any) =>{
             console.log(event);
             this.socket.send('Hello Server!');
-            notification.success({message:'websocket',description:'open'})
+            notification.success({message:'websocket',description:'open on ' + this.webSocketURL})
         }
         this.socket.onmessage = (event:any) =>{
             console.log(event);
@@ -138,6 +152,7 @@ class Store {
                 let blockData = data // {height:data.blockHeight,time:data.blockTime,hash:data.blockHash,timeDiff:timeDiff}
                 blockData['timeDiff'] = timeDiff
                 blockData['txidIndex'] = txidIndex
+                blockData['txCount'] = data.tx.length
                 blockHeightDataArray.unshift(blockData)
                 this.pushEvent('newBlockEvent',blockData)            
         
@@ -145,6 +160,71 @@ class Store {
                 this.lastBlockTime = data.blockTime
             }
         }
+    }
+
+    @action init=()=>{
+        console.log("this is init");
+        
+        window.addEventListener('Teemo.NEO.READY',async (data)=>{
+            console.log("inject READY ");
+            notification.success({message:'Teemo',description:'Teemo.NEO.READY'})     
+
+            this.isTeemoReady = true
+
+            var account
+            Teemo.NEO.getAccount()
+            .then((data)=>{
+                console.log('account',data)
+                this.updateAddress(data.address)
+            })
+            .catch((error)=>{
+                console.log('account',error)
+                this.isConnected=false
+            })         
+
+            this.updateNetwork((await Teemo.NEO.getNetworks()).defaultNetwork)          
+
+            this.socketInit()
+
+        })
+
+        window.addEventListener('Teemo.NEO.NETWORK_CHANGED',(data:any)=>{
+            console.log("NETWORK_CHANGED");
+            console.log(data);
+
+            this.updateNetwork(data.detail.defaultNetwork)
+            this.socketInit()
+        })
+
+        window.addEventListener('Teemo.NEO.CONNECTED',async (data:any)=>{
+            console.log("CONNECTED");
+            console.log(data);
+
+            notification.success({message:'Teemo',description:'Teemo.NEO.CONNECTED'})
+            this.isConnected = true
+            
+            this.updateAddress(data.detail.address)
+            this.updateNetwork((await Teemo.NEO.getNetworks()).defaultNetwork)
+        })
+
+        window.addEventListener('Teemo.NEO.DISCONNECTED',(data:any)=>{
+            console.log("DISCONNECTED");
+            console.log(data);
+
+            notification.warning({message:'Teemo',description:'Teemo.NEO.DISCONNECTED'})
+            this.isConnected = false
+
+            this.updateAddress('A**********************')
+            this.updateNetwork('TestNet')
+        })
+
+        window.addEventListener('Teemo.NEO.ACCOUNT_CHANGED',(data:any)=>{
+            console.log("ACCOUNT_CHANGED");
+            console.log(data);
+
+            notification.warning({message:'Teemo',description:'Teemo.NEO.ACCOUNT_CHANGED'})
+            
+        })
     }
 }
 

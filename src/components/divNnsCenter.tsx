@@ -28,28 +28,33 @@ interface InvokeScriptResp{
     stack: InvokeScriptRespStack[]
 }
 
-let invokeGetOwnerInfo =  {
-    "scriptHash": "348387116c4a75e420663277d9c02049907128c7",
-    "operation": "getOwnerInfo",
-    "arguments": [
-        {"type":"ByteArray","value":""},
-    ],
-    "network": "TestNet"
-}
-
 class DivNnsCenter extends React.Component<any,any> {
-    NNSh = new NNSHelper(this.props.store.scriptHash);
+    // NNSh = new NNSHelper(this.props.store); 
 
     state = {
         resData : '{}'
     }
 
+    componentDidMount(){
+        
+    }
+
     butGetInvokeReadClick = async (e:any) => {
-        invokeGetOwnerInfo.arguments[0].value = await this.NNSh.namehash(this.props.store.nns)
+        let invokeGetOwnerInfo =  {
+            "scriptHash": this.props.store.scriptHash.nns_domaincenter,
+            "operation": "getOwnerInfo",
+            "arguments": [
+                {"type":"ByteArray","value":await new NNSHelper(this.props.store).namehash(this.props.store.nns)},
+            ],
+            "network": this.props.store.network
+        } 
+
+        // invokeGetOwnerInfo.arguments[0].value = await this.NNSh.namehash(this.props.store.nns)
+        //console.log(JSON.stringify(invokeGetOwnerInfo,null,2))
 
         var nnsOwnerInfoData:InvokeScriptResp = await Teemo.NEO.invokeRead(JSON.parse(JSON.stringify(invokeGetOwnerInfo)) as InvokeReadInput)
         var stack0:any = nnsOwnerInfoData.stack[0].value;
-        console.log(nnsOwnerInfoData)
+        //console.log(JSON.stringify(nnsOwnerInfoData,null,2))
         var nnsOwnerInfo:OwnerInfo = {
             owner:stack0[0].value,
             register:stack0[1].value,
@@ -62,7 +67,7 @@ class DivNnsCenter extends React.Component<any,any> {
         }
         nnsOwnerInfo.domain = NeoHelper.hex2a(nnsOwnerInfo.domain)
         nnsOwnerInfo.TTL = NeoHelper.hex2TimeStr(nnsOwnerInfo.TTL)
-        nnsOwnerInfo.owner = await Teemo.NEO.getAddressFromScriptHash(NeoHelper.byte2Hex(NeoHelper.hex2Byte(nnsOwnerInfo.owner).reverse()))
+        if(nnsOwnerInfo.owner != '') nnsOwnerInfo.owner = await Teemo.NEO.getAddressFromScriptHash(NeoHelper.byte2Hex(NeoHelper.hex2Byte(nnsOwnerInfo.owner).reverse()))
         this.setState({
             resData: JSON.stringify(nnsOwnerInfo, null, 2)                                 
         });

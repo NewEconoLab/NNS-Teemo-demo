@@ -21,36 +21,36 @@ interface InvokeScriptResp{
     stack: InvokeScriptRespStack[]
 }
 
-let invokeRead_resolve =  {
-    "scriptHash": "",
-    "operation": "resolve",
-    "arguments": [
-        {"type":"String","value":"addr"},
-        {"type":"ByteArray","value":""}
-    ],
-    "network": "TestNet"
-}
-
 class DivNnsResolver extends React.Component<any,any> {
-    NNSh = new NNSHelper(this.props.store.scriptHash);
-
+    // NNSh = new NNSHelper(this.props.store);
+    
     state = {
         resData : '{}'
     }  
 
     componentDidMount(){
-        invokeRead_resolve.scriptHash = this.props.store.scriptHash.nns_resolver
+        
     }
 
     butGetInvokeReadClick = async (e:any) => {
-        invokeRead_resolve.arguments[1].value = await this.NNSh.namehash(this.props.store.nns)
+        let invokeRead_resolve =  {
+            "scriptHash": this.props.store.scriptHash.nns_resolver,
+            "operation": "resolve",
+            "arguments": [
+                {"type":"String","value":"addr"},
+                {"type":"ByteArray","value":await new NNSHelper(this.props.store).namehash(this.props.store.nns)}
+            ],
+            "network": this.props.store.network
+        }
 
-        //console.log(invokeRead_resolve)
+        // invokeRead_resolve.arguments[1].value = await this.NNSh.namehash(this.props.store.nns)
+
+        //console.log(this.invokeRead_resolve)
         var resolverData:InvokeScriptResp = await Teemo.NEO.invokeRead(JSON.parse(JSON.stringify(invokeRead_resolve)) as InvokeReadInput)       
         //console.log(resolverData);
 
         this.setState({
-            resData:NeoHelper.hex2a(resolverData.stack[0].value)                                 
+            resData:NeoHelper.hex2a(resolverData.stack[0].value)==''?'未映射':NeoHelper.hex2a(resolverData.stack[0].value)                                 
         });
     }
 

@@ -24,54 +24,16 @@ interface InvokeScriptResp{
     stack: InvokeScriptRespStack[]
 }
 
-let invokeRead_credit =  {
-    "scriptHash": "",
-    "operation": "getCreditInfo",
-    "arguments": [
-        {"type":"Address","value":""}
-    ],
-    "network": "TestNet"
-}
-
-let invoke_credit_authenticate =  {
-    "scriptHash": "",
-    "operation": "authenticate",
-    "arguments": [
-        {"type":"Address","value":""},
-        {"type":"Array","value":[]}
-    ],
-    "fee":"0",
-    "description":"NNS反向解析绑定",
-    "network": "TestNet"
-}
-
-let invoke_credit_revoke =  {
-    "scriptHash": "",
-    "operation": "revoke",
-    "arguments": [
-        {"type":"Address","value":""},
-    ],
-    "fee":"0",
-    "description":"NNS反向解析解绑",
-    "network": "TestNet"
-}
-
 class DivNnsCredit extends React.Component<any,any> {
-    NNSh = new NNSHelper(this.props.store.scriptHash);
-
     state = {
         resDataRead : '{}',
         reqDataWrite : '{}',
         resDataWrite : '{}',
         loadingR : false,
         loadingW : false
-    }  
+    }
 
     componentDidMount(){
-        invokeRead_credit.scriptHash = this.props.store.scriptHash.nns_credit
-        invoke_credit_authenticate.scriptHash = this.props.store.scriptHash.nns_credit
-        invoke_credit_revoke.scriptHash = this.props.store.scriptHash.nns_credit
-
         window.addEventListener ("newBlockEvent", this.doOnEvent, false)
     }
 
@@ -87,25 +49,42 @@ class DivNnsCredit extends React.Component<any,any> {
     }
 
     getInvokeRead = async () =>{
+        let invokeRead_credit =  {
+            "scriptHash": this.props.store.scriptHash.nns_credit,
+            "operation": "getCreditInfo",
+            "arguments": [
+                {"type":"Address","value":""}
+            ],
+            "network": this.props.store.network
+        }
+
         invokeRead_credit.arguments[0].value =  this.props.store.address//await this.NNSh.namehash(this.state.inputValue)
 
-        //console.log(invokeRead_resolve)
+        console.log(JSON.stringify(invokeRead_credit,null,2))
         var creditData:InvokeScriptResp = await Teemo.NEO.invokeRead(JSON.parse(JSON.stringify(invokeRead_credit)) as InvokeReadInput)       
         //console.log(creditData);
 
-        var stack0:any = creditData.stack[0].value;
-        var creditInfo:NNScredit = {
-            namehash:stack0[0].value,
-            fullDomainName:stack0[1].value,
-            TTL:stack0[2].value,
+        if(creditData.stack[0] != null){
+            var stack0:any = creditData.stack[0].value;
+            var creditInfo:NNScredit = {
+                namehash:stack0[0].value,
+                fullDomainName:stack0[1].value,
+                TTL:stack0[2].value,
+            }
+            creditInfo.fullDomainName = NeoHelper.hex2a(creditInfo.fullDomainName)
+            creditInfo.TTL = NeoHelper.hex2TimeStr(creditInfo.TTL)
+    
+            this.setState({
+                resDataRead:JSON.stringify(creditInfo, null, 2),
+                loadingR:false                                 
+            });
         }
-        creditInfo.fullDomainName = NeoHelper.hex2a(creditInfo.fullDomainName)
-        creditInfo.TTL = NeoHelper.hex2TimeStr(creditInfo.TTL)
-
-        this.setState({
-            resDataRead:JSON.stringify(creditInfo, null, 2),
-            loadingR:false                                 
-        });
+        else{
+            this.setState({
+                resDataRead:"从未映射",
+                loadingR:false                                 
+            });
+        }
     }
 
     butGetInvokeReadClick = async (e:any) => {
@@ -113,6 +92,18 @@ class DivNnsCredit extends React.Component<any,any> {
     }
 
     butInvokeCreditAuthenticateClick = async(e:any) => {
+        let invoke_credit_authenticate =  {
+            "scriptHash": this.props.store.scriptHash.nns_credit,
+            "operation": "authenticate",
+            "arguments": [
+                {"type":"Address","value":""},
+                {"type":"Array","value":[]}
+            ],
+            "fee":"0",
+            "description":"NNS反向解析绑定",
+            "network": this.props.store.network
+        }
+
         invoke_credit_authenticate.arguments[0].value = this.props.store.address
         invoke_credit_authenticate.arguments[1].value = []
         for (const str of this.props.store.nns.split('.').reverse()) {
@@ -135,6 +126,17 @@ class DivNnsCredit extends React.Component<any,any> {
     }
 
     butInvokeCreditRevokeClick = async(e:any) => {
+        let invoke_credit_revoke =  {
+            "scriptHash": this.props.store.scriptHash.nns_credit,
+            "operation": "revoke",
+            "arguments": [
+                {"type":"Address","value":""},
+            ],
+            "fee":"0",
+            "description":"NNS反向解析解绑",
+            "network": this.props.store.network
+        }  
+
         invoke_credit_revoke.arguments[0].value = this.props.store.address
 
         this.setState({

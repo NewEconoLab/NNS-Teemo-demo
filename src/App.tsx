@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import { createStore } from 'redux'
-import { Layout, Menu, Icon, notification, Input } from 'antd';
+import { Layout, Menu, Icon, notification, Input,Spin } from 'antd';
 import { any } from 'prop-types';
 
 import Store from './store';
@@ -21,62 +21,19 @@ const {
   Header, Content, Footer, Sider,
 } = Layout;
 
-const webSocketURL = 'ws://47.99.35.147:82/ws/testnet'
+// const webSocketURL = 'ws://47.99.35.147:82/ws/testnet'
 
 let div_defult = () =>{
   return <p>div_defult</p>
 }
 
-let time = new Date().getTime()
+// let time = new Date().getTime()
 
-const store = new Store(webSocketURL);
+const store = new Store();
 
 class App extends Component {
   state = {
-    menuID: 1,
-    // address : 'address',
-    // network : "network",
-    // teemoReady:false
-  }
-
-  componentWillMount(){
-    this.init()
-  }
-
-  average = (arr:Array<any>) => {
-    const nums = [].concat(...arr);
-    return nums.reduce((acc, val) => acc + val, 0) / nums.length;
-  };
-
-  init=()=>{
-    //console.log("this is init");
-    
-    window.addEventListener('Teemo.NEO.READY',async (data)=>{
-      //console.log(this.state)
-      console.log("inject READY ");
-      notification.success({message:'Teemo',description:'Teemo.NEO.READY'})
-
-      store.updateAddress((await Teemo.NEO.getAccount()).address)
-      store.updateNetwork((await Teemo.NEO.getNetworks()).defaultNetwork)
-
-      // this.setState({
-      //   address: (await Teemo.NEO.getAccount()).address,
-      //   network: (await Teemo.NEO.getNetworks()).defaultNetwork,
-      //   teemoReady:true                     
-      // }); 
-      //console.log(this.state)
-    })
-
-    window.addEventListener('Teemo.NEO.NETWORK_CHANGED',(data:any)=>{
-      console.log("NETWORK_CHANGED");
-      console.log(data);
-
-      store.updateNetwork(data.detail.defaultNetwork)
-
-      // this.setState({
-      //   network: data.detail.defaultNetwork                      
-      // }); 
-    })
+    menuID: 1
   }
 
   menuClick = (e:any) => {
@@ -98,7 +55,7 @@ class App extends Component {
       div_main = <DivNnsResolver store={store} title="NNS Resolver" />
     }
     else if (this.state.menuID == 4) {
-      div_main = <DivAuction store={store} title="NNS Auction" />
+      div_main = <DivAuction store={store} title="NNS Auction(Only *.test)" />
     }
     else if (this.state.menuID == 5) {
       div_main = <DivNnsCredit store={store} title="NNS Credit" />
@@ -144,7 +101,6 @@ class App extends Component {
             <h1>--- NNS Teemo Demo ---</h1>
           </Header>
           <Content style={{ margin: '24px 16px 0' }}>
-            {/* <MobxTest store={store}/> */}
             <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
                 {div_main}
             </div>
