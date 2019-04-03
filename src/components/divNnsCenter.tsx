@@ -5,11 +5,6 @@ import { any, number } from 'prop-types';
 import NeoHelper from '../Tools/neoHelper'
 import NNSHelper from '../Tools/nnsHelper'
 
-interface IProps{
-    title:string
-    scriptHash:any
-}
-
 interface OwnerInfo
 {
     owner:string//如果长度=0 表示没有初始化
@@ -42,16 +37,15 @@ let invokeGetOwnerInfo =  {
     "network": "TestNet"
 }
 
-class DivNnsCenter extends React.Component<IProps,any> {
-    NNSh = new NNSHelper(this.props.scriptHash);
+class DivNnsCenter extends React.Component<any,any> {
+    NNSh = new NNSHelper(this.props.store.scriptHash);
 
     state = {
-        resData : '{}',
-        inputValue : 'qmz.test'
+        resData : '{}'
     }
 
     butGetInvokeReadClick = async (e:any) => {
-        invokeGetOwnerInfo.arguments[0].value = await this.NNSh.namehash(this.state.inputValue)
+        invokeGetOwnerInfo.arguments[0].value = await this.NNSh.namehash(this.props.store.nns)
 
         var nnsOwnerInfoData:InvokeScriptResp = await Teemo.NEO.invokeRead(JSON.parse(JSON.stringify(invokeGetOwnerInfo)) as InvokeReadInput)
         var stack0:any = nnsOwnerInfoData.stack[0].value;
@@ -76,17 +70,18 @@ class DivNnsCenter extends React.Component<IProps,any> {
         //this.invokeRead(JSON.stringify(invokeRead3))
     }
 
-    handelChange(e:any){
-        this.setState({
-            inputValue:e.target.value
-        })
-    }
+    // handelChange(e:any){
+    //     this.setState({
+    //         inputValue:e.target.value
+    //     })
+    // }
 
     render() {
       return ( 
         <>
             <p>{this.props.title}</p>
-            <Input id="NNSinput" placeholder="输入要查询的NSS域名" onChange={this.handelChange.bind(this)} defaultValue={this.state.inputValue}/>
+            {/* <Input id="NNSinput" placeholder="输入要查询的NSS域名" onChange={this.handelChange.bind(this)} defaultValue={this.state.inputValue}/> */}
+            <Input placeholder="输入NSS域名" onChange={(e)=>{this.props.store.updateNNS(e.target.value)}} defaultValue={this.props.store.nns}/>
             <Button onClick={this.butGetInvokeReadClick} type="primary">获取NNS所有者信息</Button>
             <pre>{this.state.resData}</pre>
         </>

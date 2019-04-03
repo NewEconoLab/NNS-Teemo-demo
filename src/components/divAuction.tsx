@@ -6,13 +6,6 @@ import { any, number } from 'prop-types';
 import NeoHelper from '../Tools/neoHelper'
 import NNSHelper from '../Tools/nnsHelper'
 
-interface IProps{
-    title:string
-    address:string
-    teemoReady:boolean
-    scriptHash:any
-}
-
 interface AuctionState
 {
     id:string; //拍卖id,就是拍卖生成的auctionid
@@ -127,7 +120,7 @@ let invoke_auction_doStartAuction =  {
         {"type":"String","value":""}
     ],
     "fee":"0",
-    "description":"NNS竞拍加价",
+    "description":"NNS竞拍开标",
     "network": "TestNet"
 }
 
@@ -140,7 +133,7 @@ let invoke_auction_doBid =  {
         {"type":"Integer","value":0}
     ],
     "fee":"0",
-    "description":"NNS竞拍开标",
+    "description":"NNS竞拍加价",
     "network": "TestNet"
 }
 
@@ -205,14 +198,12 @@ let invoke_credit_revoke =  {
 }
 
 class DivAuction extends React.Component<any,any> {
-    NNSh = new NNSHelper(this.props.scriptHash);
+    NNSh = new NNSHelper(this.props.store.scriptHash);
 
     state = {
         resDataRead : '{}',
         reqDataWrite : '{}',
         resDataWrite : '{}',
-        inputValueAddr : this.props.address,
-        inputValueNns : 'qmz.test',
         inputAmount: 0,
         loadingR : true,
         loadingW : false,
@@ -238,18 +229,18 @@ class DivAuction extends React.Component<any,any> {
 
     intervalID:any
     componentDidMount(){
-        invokeRead_CGAS_getBanlance.scriptHash = this.props.scriptHash.NEP_5_CGAS
-        invokeRead_auction_getBanlance.scriptHash = this.props.scriptHash.nns_auction
-        invoke_CGAS_doCGASinStep0.scriptHash = this.props.scriptHash.NEP_5_CGAS
-        invoke_auction_doCGASinStep1.scriptHash = this.props.scriptHash.nns_auction
-        invoke_auction_doCGASout.scriptHash = this.props.scriptHash.nns_auction
-        invokeRead_auction_getAuctionState.scriptHash = this.props.scriptHash.nns_auction
-        invoke_auction_doStartAuction.scriptHash = this.props.scriptHash.nns_auction
-        invoke_auction_doBid.scriptHash = this.props.scriptHash.nns_auction
-        invokeRead_auction_getBalanceOfBid.scriptHash = this.props.scriptHash.nns_auction
-        invoke_auction_doBidSettlement.scriptHash = this.props.scriptHash.nns_auction
-        invoke_auction_doCollect.scriptHash = this.props.scriptHash.nns_auction
-        invoke_auction_doRenew.scriptHash = this.props.scriptHash.nns_auction
+        invokeRead_CGAS_getBanlance.scriptHash = this.props.store.scriptHash.NEP_5_CGAS
+        invokeRead_auction_getBanlance.scriptHash = this.props.store.scriptHash.nns_auction
+        invoke_CGAS_doCGASinStep0.scriptHash = this.props.store.scriptHash.NEP_5_CGAS
+        invoke_auction_doCGASinStep1.scriptHash = this.props.store.scriptHash.nns_auction
+        invoke_auction_doCGASout.scriptHash = this.props.store.scriptHash.nns_auction
+        invokeRead_auction_getAuctionState.scriptHash = this.props.store.scriptHash.nns_auction
+        invoke_auction_doStartAuction.scriptHash = this.props.store.scriptHash.nns_auction
+        invoke_auction_doBid.scriptHash = this.props.store.scriptHash.nns_auction
+        invokeRead_auction_getBalanceOfBid.scriptHash = this.props.store.scriptHash.nns_auction
+        invoke_auction_doBidSettlement.scriptHash = this.props.store.scriptHash.nns_auction
+        invoke_auction_doCollect.scriptHash = this.props.store.scriptHash.nns_auction
+        invoke_auction_doRenew.scriptHash = this.props.store.scriptHash.nns_auction
 
         this.intervalID = setInterval(async ()=>{
             this.setState({
@@ -257,23 +248,25 @@ class DivAuction extends React.Component<any,any> {
             })           
         },1000)
 
-        console.log("teemoReady:" ,this.props.teemoReady)
-        if(this.props.teemoReady)
-        {
-            console.log(1)
-            this.getInvokeRead_getBanlance()
-        }
-        else{
-            console.log(0)
-            var intervalID = setInterval(()=>{
-                console.log("teemoReady:" ,this.props.teemoReady)
-                if(this.props.teemoReady)
-                {
-                    setTimeout(()=>{this.getInvokeRead_getBanlance()},1000)                   
-                    clearInterval(intervalID)
-                }               
-            },1000) 
-        }      
+        this.getInvokeRead_getBanlance()
+
+        // console.log("teemoReady:" ,this.props.teemoReady)
+        // if(this.props.teemoReady)
+        // {
+        //     console.log(1)
+        //     this.getInvokeRead_getBanlance()
+        // }
+        // else{
+        //     console.log(0)
+        //     var intervalID = setInterval(()=>{
+        //         console.log("teemoReady:" ,this.props.teemoReady)
+        //         if(this.props.teemoReady)
+        //         {
+        //             setTimeout(()=>{this.getInvokeRead_getBanlance()},1000)                   
+        //             clearInterval(intervalID)
+        //         }               
+        //     },1000) 
+        // }      
 
         window.addEventListener ("newBlockEvent", this.doOnEvent, false)
     }
@@ -296,11 +289,11 @@ class DivAuction extends React.Component<any,any> {
     }
 
     getInvokeRead_getBanlance = async () =>{
-        invokeRead_CGAS_getBanlance.arguments[0].value =  this.state.inputValueAddr//await this.NNSh.namehash(this.state.inputValue)
-        invokeRead_auction_getBanlance.arguments[0].value =  this.state.inputValueAddr
-        invokeRead_auction_getAuctionState.arguments[0].value = await this.NNSh.namehash(this.state.inputValueNns)
-        invokeRead_auction_getBalanceOfBid.arguments[0].value = this.state.inputValueAddr
-        invokeRead_auction_getBalanceOfBid.arguments[1].value = this.state.auctionStateInfo.id
+        invokeRead_CGAS_getBanlance.arguments[0].value =  this.props.store.address//await this.NNSh.namehash(this.state.inputValue)
+
+        invokeRead_auction_getBanlance.arguments[0].value =  this.props.store.address
+
+        invokeRead_auction_getAuctionState.arguments[0].value = await this.NNSh.namehash(this.props.store.nns)
 
         //console.log(invokeRead_resolve)
         var InvokeReadGroupInput = {group:[{}]}
@@ -308,13 +301,12 @@ class DivAuction extends React.Component<any,any> {
         InvokeReadGroupInput.group.push(invokeRead_CGAS_getBanlance)
         InvokeReadGroupInput.group.push(invokeRead_auction_getBanlance)
         InvokeReadGroupInput.group.push(invokeRead_auction_getAuctionState)
-        InvokeReadGroupInput.group.push(invokeRead_auction_getBalanceOfBid)
         
-        console.log(JSON.stringify(invokeRead_auction_getBalanceOfBid));
+        //console.log(JSON.stringify(InvokeReadGroupInput));
         
         var resData:InvokeScriptResp = await Teemo.NEO.invokeReadGroup(JSON.parse(JSON.stringify(InvokeReadGroupInput)) as InvokeReadGroup)       
         //console.log(resData.stack[3].value);
-        console.log(resData)
+        //console.log(resData)
 
         var stack2:any = resData.stack[2].value;
         //console.log(stack2)
@@ -335,9 +327,18 @@ class DivAuction extends React.Component<any,any> {
         AuctionStateInfo.domain = NeoHelper.hex2a(AuctionStateInfo.domain)
         AuctionStateInfo.domainTTL = NeoHelper.hex2TimeStr(AuctionStateInfo.domainTTL)
         AuctionStateInfo.maxPrice = AuctionStateInfo.maxPrice/10**8
-        AuctionStateInfo.maxBuyer = await Teemo.NEO.getAddressFromScriptHash(NeoHelper.hexReverse(AuctionStateInfo.maxBuyer))
+        if(AuctionStateInfo.maxBuyer != ''){
+            AuctionStateInfo.maxBuyer = await Teemo.NEO.getAddressFromScriptHash(NeoHelper.hexReverse(AuctionStateInfo.maxBuyer))
+        }      
 
-        //console.log(AuctionStateInfo)
+        //---第二轮invokescript
+
+        invokeRead_auction_getBalanceOfBid.arguments[0].value = this.props.store.address
+        invokeRead_auction_getBalanceOfBid.arguments[1].value = AuctionStateInfo.id
+
+        var resData2:InvokeScriptResp = await Teemo.NEO.invokeRead(JSON.parse(JSON.stringify(invokeRead_auction_getBalanceOfBid)) as InvokeArgs)
+
+        //console.log('AuctionStateInfo',AuctionStateInfo)
 
         //var CGAS_balacnce = resData.stack[0].value
         //console.log(NeoHelper.hex2Int(CGAS_balacnce)/10**8)
@@ -345,7 +346,7 @@ class DivAuction extends React.Component<any,any> {
         this.setState({
             CGASBalance:NeoHelper.hex2Int(resData.stack[0].value)/10**8,
             auctionBalance:NeoHelper.hex2Int(resData.stack[1].value)/10**8,
-            bidBalance:NeoHelper.hex2Int(resData.stack[3].value)/10**8,
+            bidBalance:NeoHelper.hex2Int(resData2.stack[0].value)/10**8,
             auctionStateInfo:AuctionStateInfo,
             auctionDay:await this.calcAuctionDay(AuctionStateInfo.startBlockSelling),
             resDataRead:JSON.stringify(AuctionStateInfo,null,2),
@@ -360,8 +361,8 @@ class DivAuction extends React.Component<any,any> {
     }
 
     butInvoke_doCGASin_click = async () =>{
-        invoke_CGAS_doCGASinStep0.arguments[0].value = this.state.inputValueAddr
-        invoke_CGAS_doCGASinStep0.arguments[1].value = await Teemo.NEO.getAddressFromScriptHash(this.props.scriptHash.nns_auction)
+        invoke_CGAS_doCGASinStep0.arguments[0].value = this.props.store.address
+        invoke_CGAS_doCGASinStep0.arguments[1].value = await Teemo.NEO.getAddressFromScriptHash(this.props.store.scriptHash.nns_auction)
         invoke_CGAS_doCGASinStep0.arguments[2].value = this.state.CGASopValue * (10**8)
 
         //console.log(invoke_CGAS_doCGASinStep0)
@@ -393,7 +394,7 @@ class DivAuction extends React.Component<any,any> {
     }
 
     butInvoke_doCGASout_click = async () =>{
-        invoke_auction_doCGASout.arguments[0].value = this.state.inputValueAddr
+        invoke_auction_doCGASout.arguments[0].value = this.props.store.address
         invoke_auction_doCGASout.arguments[1].value = this.state.CGASopValue * (10**8)
 
         this.setState({
@@ -412,9 +413,9 @@ class DivAuction extends React.Component<any,any> {
     }
 
     butInvoke_doStartAuction_click = async () =>{
-        invoke_auction_doStartAuction.arguments[0].value = this.state.inputValueAddr;
-        invoke_auction_doStartAuction.arguments[1].value = await this.NNSh.namehash(this.state.inputValueNns.split('.')[1])
-        invoke_auction_doStartAuction.arguments[2].value = this.state.inputValueNns.split('.')[0]
+        invoke_auction_doStartAuction.arguments[0].value = this.props.store.address;
+        invoke_auction_doStartAuction.arguments[1].value = await this.NNSh.namehash(this.props.store.nns.split('.')[1])
+        invoke_auction_doStartAuction.arguments[2].value = this.props.store.nns.split('.')[0]
 
         //console.log(invoke_auction_doStartAuction)
 
@@ -434,7 +435,7 @@ class DivAuction extends React.Component<any,any> {
     }
 
     butInvoke_doBid_click = async() =>{
-        invoke_auction_doBid.arguments[0].value = this.state.inputValueAddr;
+        invoke_auction_doBid.arguments[0].value = this.props.store.address;
         invoke_auction_doBid.arguments[1].value = this.state.auctionStateInfo.id
         invoke_auction_doBid.arguments[2].value = (this.state.inputAmount*(10**8)).toString()
 
@@ -456,10 +457,10 @@ class DivAuction extends React.Component<any,any> {
     }
 
     butInvoke_doBidSettlementAndCollect_click = async() =>{
-        invoke_auction_doBidSettlement.arguments[0].value = this.state.inputValueAddr
+        invoke_auction_doBidSettlement.arguments[0].value = this.props.store.address
         invoke_auction_doBidSettlement.arguments[1].value = this.state.auctionStateInfo.id
 
-        invoke_auction_doCollect.arguments[0].value = this.state.inputValueAddr
+        invoke_auction_doCollect.arguments[0].value = this.props.store.address
         invoke_auction_doCollect.arguments[1].value = this.state.auctionStateInfo.id
 
         var InvokeGroupInput = {merge:false,group:[{}]}
@@ -488,9 +489,9 @@ class DivAuction extends React.Component<any,any> {
     }
 
     butInvoke_doRenew_click = async() =>{
-        invoke_auction_doRenew.arguments[0].value = this.state.inputValueAddr
-        invoke_auction_doRenew.arguments[1].value = await this.NNSh.namehash(this.state.inputValueNns.split('.')[1])
-        invoke_auction_doRenew.arguments[2].value = this.state.inputValueNns.split('.')[0]
+        invoke_auction_doRenew.arguments[0].value = this.props.store.address
+        invoke_auction_doRenew.arguments[1].value = await this.NNSh.namehash(this.props.store.nns.split('.')[1])
+        invoke_auction_doRenew.arguments[2].value = this.props.store.nns.split('.')[0]
 
         console.log(invoke_auction_doRenew)
 
@@ -510,9 +511,9 @@ class DivAuction extends React.Component<any,any> {
     }
 
     butInvokeCreditAuthenticateClick = async(e:any) => {
-        invoke_credit_authenticate.arguments[0].value = this.state.inputValueAddr
+        invoke_credit_authenticate.arguments[0].value = this.props.store.address
         invoke_credit_authenticate.arguments[1].value = []
-        for (const str of this.state.inputValueNns.split('.').reverse()) {
+        for (const str of this.props.store.nns.split('.').reverse()) {
             ((invoke_credit_authenticate.arguments as Argument[])[1].value as Argument[]).push({type:"String",value:str});
         }
 
@@ -532,7 +533,7 @@ class DivAuction extends React.Component<any,any> {
     }
 
     butInvokeCreditRevokeClick = async(e:any) => {
-        invoke_credit_revoke.arguments[0].value = this.state.inputValueAddr
+        invoke_credit_revoke.arguments[0].value = this.props.store.address
 
         this.setState({
             loadingW:true                                
@@ -555,17 +556,17 @@ class DivAuction extends React.Component<any,any> {
         })
     }
 
-    addrChange(e:any){
-        this.setState({
-            inputValueAddr:e.target.value
-        })
-    }
+    // addrChange(e:any){
+    //     this.setState({
+    //         inputValueAddr:e.target.value
+    //     })
+    // }
 
-    nnsChange(e:any){
-        this.setState({
-            inputValueNns:e.target.value
-        })
-    }
+    // nnsChange(e:any){
+    //     this.setState({
+    //         inputValueNns:e.target.value
+    //     })
+    // }
 
     amountChange(e:any){
         this.setState({
@@ -602,8 +603,10 @@ class DivAuction extends React.Component<any,any> {
                     </Spin>                  
                 </Col>
             </Row>
-            <Input placeholder="输入要查询的地址" onChange={this.addrChange.bind(this)} defaultValue={this.state.inputValueAddr}/>
-            <Input placeholder="输入要绑定的NNS" onChange={this.nnsChange.bind(this)} defaultValue={this.state.inputValueNns}/>
+            {/* <Input placeholder="输入要查询的地址" onChange={this.addrChange.bind(this)} defaultValue={this.props.store.address}/> */}
+            {/* <Input placeholder="输入要绑定的NNS" onChange={this.nnsChange.bind(this)} defaultValue={this.props.store.nns}/> */}
+            <Input placeholder="输入地址" onChange={(e)=>{this.props.store.updateAddress(e.target.value)}} defaultValue={this.props.store.address}/>
+            <Input placeholder="输入NSS域名" onChange={(e)=>{this.props.store.updateNNS(e.target.value)}} defaultValue={this.props.store.nns}/>
             <Button onClick={this.butGetInvokeReadClick} type="primary">刷新数据</Button>
             <Divider type="vertical" />
             <Button onClick={this.butInvoke_doStartAuction_click}>开标</Button>           

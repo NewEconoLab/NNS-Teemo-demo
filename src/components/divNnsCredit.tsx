@@ -6,12 +6,6 @@ import { any, number } from 'prop-types';
 import NeoHelper from '../Tools/neoHelper'
 import NNSHelper from '../Tools/nnsHelper'
 
-interface IProps{
-    title:string
-    address:string
-    scriptHash:any
-}
-
 interface NNScredit
 {
     namehash:string
@@ -63,22 +57,20 @@ let invoke_credit_revoke =  {
 }
 
 class DivNnsCredit extends React.Component<any,any> {
-    NNSh = new NNSHelper(this.props.scriptHash);
+    NNSh = new NNSHelper(this.props.store.scriptHash);
 
     state = {
         resDataRead : '{}',
         reqDataWrite : '{}',
         resDataWrite : '{}',
-        inputValueAddr : this.props.address,
-        inputValueNns : 'qmz.test',
         loadingR : false,
         loadingW : false
     }  
 
     componentDidMount(){
-        invokeRead_credit.scriptHash = this.props.scriptHash.nns_credit
-        invoke_credit_authenticate.scriptHash = this.props.scriptHash.nns_credit
-        invoke_credit_revoke.scriptHash = this.props.scriptHash.nns_credit
+        invokeRead_credit.scriptHash = this.props.store.scriptHash.nns_credit
+        invoke_credit_authenticate.scriptHash = this.props.store.scriptHash.nns_credit
+        invoke_credit_revoke.scriptHash = this.props.store.scriptHash.nns_credit
 
         window.addEventListener ("newBlockEvent", this.doOnEvent, false)
     }
@@ -95,7 +87,7 @@ class DivNnsCredit extends React.Component<any,any> {
     }
 
     getInvokeRead = async () =>{
-        invokeRead_credit.arguments[0].value =  this.state.inputValueAddr//await this.NNSh.namehash(this.state.inputValue)
+        invokeRead_credit.arguments[0].value =  this.props.store.address//await this.NNSh.namehash(this.state.inputValue)
 
         //console.log(invokeRead_resolve)
         var creditData:InvokeScriptResp = await Teemo.NEO.invokeRead(JSON.parse(JSON.stringify(invokeRead_credit)) as InvokeReadInput)       
@@ -121,9 +113,9 @@ class DivNnsCredit extends React.Component<any,any> {
     }
 
     butInvokeCreditAuthenticateClick = async(e:any) => {
-        invoke_credit_authenticate.arguments[0].value = this.state.inputValueAddr
+        invoke_credit_authenticate.arguments[0].value = this.props.store.address
         invoke_credit_authenticate.arguments[1].value = []
-        for (const str of this.state.inputValueNns.split('.').reverse()) {
+        for (const str of this.props.store.nns.split('.').reverse()) {
             ((invoke_credit_authenticate.arguments as Argument[])[1].value as Argument[]).push({type:"String",value:str});
         }
 
@@ -143,7 +135,7 @@ class DivNnsCredit extends React.Component<any,any> {
     }
 
     butInvokeCreditRevokeClick = async(e:any) => {
-        invoke_credit_revoke.arguments[0].value = this.state.inputValueAddr
+        invoke_credit_revoke.arguments[0].value = this.props.store.address
 
         this.setState({
             loadingW:true                                
@@ -160,24 +152,26 @@ class DivNnsCredit extends React.Component<any,any> {
         });
     }
 
-    addrChange(e:any){
-        this.setState({
-            inputValueAddr:e.target.value
-        })
-    }
+    // addrChange(e:any){
+    //     this.setState({
+    //         inputValueAddr:e.target.value
+    //     })
+    // }
 
-    nnsChange(e:any){
-        this.setState({
-            inputValueNns:e.target.value
-        })
-    }
+    // nnsChange(e:any){
+    //     this.setState({
+    //         inputValueNns:e.target.value
+    //     })
+    // }
 
     render() {
       return ( 
         <>
             <p>{this.props.title}</p>
-            <Input placeholder="输入要查询的地址" onChange={this.addrChange.bind(this)} defaultValue={this.state.inputValueAddr}/>
-            <Input placeholder="输入要绑定的NNS" onChange={this.nnsChange.bind(this)} defaultValue={this.state.inputValueNns}/>
+            {/* <Input placeholder="输入要查询的地址" onChange={this.addrChange.bind(this)} defaultValue={this.state.inputValueAddr}/>
+            <Input placeholder="输入要绑定的NNS" onChange={this.nnsChange.bind(this)} defaultValue={this.state.inputValueNns}/> */}
+            <Input placeholder="输入地址" onChange={(e)=>{this.props.store.updateAddress(e.target.value)}} defaultValue={this.props.store.address}/>
+            <Input placeholder="输入NSS域名" onChange={(e)=>{this.props.store.updateNNS(e.target.value)}} defaultValue={this.props.store.nns}/>
             <Button onClick={this.butGetInvokeReadClick} type="primary">获取NNS反向解析信息</Button>
             <Button onClick={this.butInvokeCreditAuthenticateClick}>绑定</Button>
             <Button onClick={this.butInvokeCreditRevokeClick}>解绑</Button>

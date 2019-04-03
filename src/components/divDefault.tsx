@@ -9,30 +9,24 @@ import { any, number } from 'prop-types';
 import NeoHelper from '../Tools/neoHelper'
 import NNSHelper from '../Tools/nnsHelper'
 
-interface IProps{
-    title:string
-    address:string
-    network:string 
-    scriptHash:any
-  }
-
 @observer
 class DivDefault extends React.Component<any,any> {
-    NNSh = new NNSHelper(this.props.scriptHash);
+    NNSh = new NNSHelper(this.props.store.scriptHash);
 
     state = {
       resData : '{}'
-    }  
+    }
 
     render() {
       return ( 
-        <>
+        <>           
             <p>{this.props.title}</p>
-            <p>{this.props.address}</p>
-            <p>{this.props.network}</p>
+            <p>{this.props.store.address}</p>
+            <p>{this.props.store.network}</p>
+            <p>{this.props.store.nns}</p>
             {/* <p>block: {this.props.blockHeight}</p>
             <p>notify: {this.props.notifyHeight}</p> */}
-            <pre>{JSON.stringify(this.props.scriptHash,null,2)}</pre>          
+            <pre>{JSON.stringify(this.props.store.scriptHash,null,2)}</pre>          
         <div>
           <div className="demo-loading-container">
             <Spin />
