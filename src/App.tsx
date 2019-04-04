@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom'
 import './App.css';
 import { createStore } from 'redux'
 import { Layout, Menu, Icon, notification, Input,Spin } from 'antd';
 import { any } from 'prop-types';
+import {observer,inject} from 'mobx-react';
 
-import Store from './store';
+// import Store from './store';
 import DivDefault from './components/divDefault';
 import DivNnsCenter from './components/divNnsCenter';
 import DivNnsResolver from './components/divNnsResolver';
@@ -29,9 +31,11 @@ let div_defult = () =>{
 
 // let time = new Date().getTime()
 
-const store = new Store();
+// const store = new Store();
 
-class App extends Component {
+// @inject("store")
+@observer
+class App extends Component<any,any> {
   state = {
     menuID: 1
   }
@@ -46,25 +50,26 @@ class App extends Component {
   render() {
     let div_main = null;
     if (this.state.menuID == 1) {
-      div_main = <DivDefault store={store} title="default Page" />
+      div_main = <DivDefault />
     } 
     else if (this.state.menuID == 2) {
-      div_main = <DivNnsCenter store={store} title="NNS Domain Center" />
+      div_main = <DivNnsCenter />
     }
     else if (this.state.menuID == 3) {
-      div_main = <DivNnsResolver store={store} title="NNS Resolver" />
+      div_main = <DivNnsResolver />
     }
     else if (this.state.menuID == 4) {
-      div_main = <DivAuction store={store} title="NNS Auction" />
+      div_main = <DivAuction />
     }
     else if (this.state.menuID == 5) {
-      div_main = <DivNnsCredit store={store} title="NNS Credit" />
+      div_main = <DivNnsCredit />
     }
     else {
       div_main = div_defult()
     }
 
     return (
+      <Router>
       <Layout>
         <Sider
           breakpoint="lg"
@@ -99,9 +104,12 @@ class App extends Component {
         <Layout>
           <Header style={{ background: '#fff', padding: 0 }}>
             <h1>--- NNS Teemo Demo ---</h1>
+
           </Header>
           <Content style={{ margin: '24px 16px 0' }}>
             <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+                {/* <Route path="/" component={DivDefault}/>
+                <Route path="/nnscenter" component={DivNnsCenter}  /> */}
                 {div_main}
             </div>
           </Content>
@@ -110,6 +118,7 @@ class App extends Component {
           </Footer>
         </Layout>
       </Layout>
+      </Router>
     );
   }
 }

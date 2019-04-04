@@ -4,6 +4,7 @@ import { async } from 'q';
 import { any, number } from 'prop-types';
 import NeoHelper from '../Tools/neoHelper'
 import NNSHelper from '../Tools/nnsHelper'
+import {inject,observer} from 'mobx-react';
 
 interface OwnerInfo
 {
@@ -28,6 +29,8 @@ interface InvokeScriptResp{
     stack: InvokeScriptRespStack[]
 }
 
+@inject("store")
+@observer
 class DivNnsCenter extends React.Component<any,any> {
     // NNSh = new NNSHelper(this.props.store); 
 
@@ -84,7 +87,7 @@ class DivNnsCenter extends React.Component<any,any> {
     render() {
       return ( 
         <>
-            <p>{this.props.title}</p>
+            <p>NNS Domain Center</p>
             {/* <Input id="NNSinput" placeholder="输入要查询的NSS域名" onChange={this.handelChange.bind(this)} defaultValue={this.state.inputValue}/> */}
             <Input placeholder="输入NSS域名" onChange={(e)=>{this.props.store.updateNNS(e.target.value)}} defaultValue={this.props.store.nns}/>
             <Button onClick={this.butGetInvokeReadClick} type="primary">获取NNS所有者信息</Button>

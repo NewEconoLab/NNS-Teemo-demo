@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import {autorun} from 'mobx'
+import {autorun, observe} from 'mobx'
 import {Button,Input,Spin,Statistic, Row, Col, Icon,Timeline,Drawer,Switch,InputNumber,Divider} from 'antd';
 import { async } from 'q';
 import { any, number } from 'prop-types';
 import NeoHelper from '../Tools/neoHelper'
 import NNSHelper from '../Tools/nnsHelper'
 import ReactDOM from 'react-dom';
+import {inject,observer} from 'mobx-react'
 
 interface AuctionState
 {
@@ -39,6 +40,8 @@ interface InvokeScriptResp{
     stack: InvokeScriptRespStack[]
 }
 
+@inject("store")
+@observer
 class DivAuction extends React.Component<any,any> {
     //NNSh = new NNSHelper(this.props.store);
     //NEOh = new NeoHelper(this.props.store);
@@ -514,7 +517,7 @@ class DivAuction extends React.Component<any,any> {
     render() {
       return ( 
         <>
-            <p>{this.props.title}</p>
+            <p>NNS Auction</p>
             <Switch checked={this.props.store.auctionMinPerDay == 5?true:false} checkedChildren="*.test" unCheckedChildren="*.neo" defaultChecked onChange={async (e)=>{
                     console.log(e)
                     if(e) 

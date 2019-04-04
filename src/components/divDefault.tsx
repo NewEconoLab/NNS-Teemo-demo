@@ -2,13 +2,15 @@ import {
     List, message, Avatar, Spin,
   } from 'antd';
 import React, { Component } from 'react';
-import {observer} from 'mobx-react';
 import {Button,Input} from 'antd';
 import { async } from 'q';
 import { any, number } from 'prop-types';
 import NeoHelper from '../Tools/neoHelper'
 import NNSHelper from '../Tools/nnsHelper'
 
+import {inject,observer} from 'mobx-react';
+
+@inject("store")
 @observer
 class DivDefault extends React.Component<any,any> {
     NNSh = new NNSHelper(this.props.store);
@@ -21,7 +23,7 @@ class DivDefault extends React.Component<any,any> {
       return ( 
         <> 
         <Spin tip='连接Teemo……' spinning={!this.props.store.isTeemoReady}>          
-          <p>{this.props.title}</p>
+          <p>Default Page</p>
           <p>{this.props.store.address}</p>
           <p>{this.props.store.network}||{this.props.store.rpcUrl}||{this.props.store.webSocketURL}||isConnected:{this.props.store.isConnected.toString()}||{this.props.store.nns}</p>
           {/* <p>block: {this.props.blockHeight}</p>

@@ -5,6 +5,7 @@ import { async } from 'q';
 import { any, number } from 'prop-types';
 import NeoHelper from '../Tools/neoHelper'
 import NNSHelper from '../Tools/nnsHelper'
+import {inject,observer} from 'mobx-react'
 
 interface NNScredit
 {
@@ -24,6 +25,8 @@ interface InvokeScriptResp{
     stack: InvokeScriptRespStack[]
 }
 
+@inject("store")
+@observer
 class DivNnsCredit extends React.Component<any,any> {
     state = {
         resDataRead : '{}',
@@ -169,7 +172,7 @@ class DivNnsCredit extends React.Component<any,any> {
     render() {
       return ( 
         <>
-            <p>{this.props.title}</p>
+            <p>NNS Credit</p>
             {/* <Input placeholder="输入要查询的地址" onChange={this.addrChange.bind(this)} defaultValue={this.state.inputValueAddr}/>
             <Input placeholder="输入要绑定的NNS" onChange={this.nnsChange.bind(this)} defaultValue={this.state.inputValueNns}/> */}
             <Input placeholder="输入地址" onChange={(e)=>{this.props.store.updateAddress(e.target.value)}} defaultValue={this.props.store.address}/>
