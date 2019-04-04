@@ -7,12 +7,24 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { Router, Route,BrowserRouter } from 'react-router-dom'
 
+import DivDefault from './components/divDefault';
+import DivNnsCenter from './components/divNnsCenter';
+import DivNnsResolver from './components/divNnsResolver';
+import DivAuction from './components/divAuction';
+import DivNnsCredit from './components/divNnsCredit';
+
 const store = new Store();
 
 ReactDOM.render(
         <Provider store={store}>
                 <BrowserRouter basename="/nns">
-                        <App />
+                        <App>
+                                <Route path="/" exact  component={DivDefault}/>
+                                <Route path="/nnscenter" component={DivNnsCenter}/>
+                                <Route path="/nnsresolver" component={DivNnsResolver}/>
+                                <Route path="/nnsauction" component={DivAuction}/>
+                                <Route path="/nnscredit" component={DivNnsCredit}/>
+                        </App>
                 </BrowserRouter>
         </Provider>
 , document.getElementById('root'));

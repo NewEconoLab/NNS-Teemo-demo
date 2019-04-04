@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route ,Link ,withRouter  } from 'react-router-dom'
 import './App.css';
 import { createStore } from 'redux'
 import { Layout, Menu, Icon, notification, Input,Spin } from 'antd';
@@ -42,31 +42,34 @@ class App extends Component<any,any> {
 
   menuClick = (e:any) => {
     console.log('menu Click', e);
+
+    //this.props.history.push("/nnscenter")
+
     this.setState({
       menuID: e.key
     });
   } 
   
   render() {
-    let div_main = null;
-    if (this.state.menuID == 1) {
-      div_main = <DivDefault />
-    } 
-    else if (this.state.menuID == 2) {
-      div_main = <DivNnsCenter />
-    }
-    else if (this.state.menuID == 3) {
-      div_main = <DivNnsResolver />
-    }
-    else if (this.state.menuID == 4) {
-      div_main = <DivAuction />
-    }
-    else if (this.state.menuID == 5) {
-      div_main = <DivNnsCredit />
-    }
-    else {
-      div_main = div_defult()
-    }
+    // let div_main = null;
+    // if (this.state.menuID == 1) {
+    //   div_main = <DivDefault />
+    // } 
+    // else if (this.state.menuID == 2) {
+    //   div_main = <DivNnsCenter />
+    // }
+    // else if (this.state.menuID == 3) {
+    //   div_main = <DivNnsResolver />
+    // }
+    // else if (this.state.menuID == 4) {
+    //   div_main = <DivAuction />
+    // }
+    // else if (this.state.menuID == 5) {
+    //   div_main = <DivNnsCredit />
+    // }
+    // else {
+    //   div_main = div_defult()
+    // }
 
     return (
       <Router>
@@ -80,24 +83,34 @@ class App extends Component<any,any> {
           <div className="logo" />
           <Menu onClick={this.menuClick}  theme="dark" mode="inline" defaultSelectedKeys={['1']}>
             <Menu.Item key="1">
-              <Icon type="file" />
-              <span className="nav-text">Default Page</span>
+              <Link to='/'>
+                <Icon type="file" />
+                <span className="nav-text">Default Page</span>
+              </Link>
             </Menu.Item>
             <Menu.Item key="2">
-              <Icon type="file" />
-              <span className="nav-text">NNS Center</span>
+              <Link to='/nnscenter'>
+                <Icon type="file" />
+                <span className="nav-text">NNS Center</span>
+              </Link>
             </Menu.Item>
             <Menu.Item key="3">
-              <Icon type="file" />
-              <span className="nav-text">NNS resolver</span>
+              <Link to='/nnsresolver'>
+                <Icon type="file" />
+                <span className="nav-text">NNS resolver</span>
+              </Link>
             </Menu.Item>
             <Menu.Item key="4">
-              <Icon type="file" />
-              <span className="nav-text">NNS Auction</span>
+              <Link to='/nnsauction'>
+                <Icon type="file" />
+                <span className="nav-text">NNS Auction</span>
+              </Link>
             </Menu.Item>
             <Menu.Item key="5">
-              <Icon type="file" />
-              <span className="nav-text">NNS Credit</span>
+              <Link to='/nnscredit'>
+                <Icon type="file" />
+                <span className="nav-text">NNS Credit</span>
+              </Link>
             </Menu.Item>
           </Menu>
         </Sider>
@@ -108,9 +121,8 @@ class App extends Component<any,any> {
           </Header>
           <Content style={{ margin: '24px 16px 0' }}>
             <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
-                {/* <Route path="/" component={DivDefault}/>
-                <Route path="/nnscenter" component={DivNnsCenter}  /> */}
-                {div_main}
+                {this.props.children}
+                {/* {div_main} */}
             </div>
           </Content>
           <Footer style={{ textAlign: 'center' }}>
