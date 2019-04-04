@@ -1,4 +1,4 @@
-import {observable, action, computed} from 'mobx';
+import {observable, action, computed, autorun} from 'mobx';
 import { notification } from 'antd';
 import NeoHelper from './Tools/neoHelper';
 
@@ -10,15 +10,26 @@ class Store {
 
     @observable isTeemoReady = false
     @observable isConnected = true
-
-    @observable scriptHash = {
-        nns_domaincenter : "348387116c4a75e420663277d9c02049907128c7",
-        nns_resolver : "6e2aea28af9c5febea0774759b1b76398e3167f1",
-        nns_auction:"5fd8c2aed0eec0fa103f6fba16748b453baf5b2e",
-        nns_credit : "77bf387c9b5f2e2c33ef8507478b103285c55b11",
-        NEP_5_CGAS:"74f2dc36a68fdc4682034178eb2220729231db76",
-        NEP_5_NNC:"fc732edee1efdf968c23c20a9628eaa5a6ccb934"
+    
+    @observable auctionMinPerDay = 5
+    @action updateAuctionMinPerDay(minPerDay:number){
+        this.auctionMinPerDay = minPerDay
     }
+    @computed get nns_auction_hash(){
+        if(this.auctionMinPerDay == 5) return "5fd8c2aed0eec0fa103f6fba16748b453baf5b2e"
+        else return "4c7cca112a8c5666bce5da373010fc0920d0e0d2"
+    }
+
+    @computed get scriptHash(){
+        return {
+            nns_domaincenter : "348387116c4a75e420663277d9c02049907128c7",
+            nns_resolver : "6e2aea28af9c5febea0774759b1b76398e3167f1",
+            nns_auction: this.nns_auction_hash,
+            nns_credit : "77bf387c9b5f2e2c33ef8507478b103285c55b11",
+            NEP_5_CGAS:"74f2dc36a68fdc4682034178eb2220729231db76",
+            NEP_5_NNC:"fc732edee1efdf968c23c20a9628eaa5a6ccb934"
+        }
+    } 
 
     @observable network = 'TestNet'
     @observable address:string = 'A**********************'

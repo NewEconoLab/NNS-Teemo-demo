@@ -55,7 +55,7 @@ class App extends Component {
       div_main = <DivNnsResolver store={store} title="NNS Resolver" />
     }
     else if (this.state.menuID == 4) {
-      div_main = <DivAuction store={store} title="NNS Auction(Only *.test)" />
+      div_main = <DivAuction store={store} title="NNS Auction" />
     }
     else if (this.state.menuID == 5) {
       div_main = <DivNnsCredit store={store} title="NNS Credit" />

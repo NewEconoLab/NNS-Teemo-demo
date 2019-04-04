@@ -5,6 +5,7 @@ import { async } from 'q';
 import { any, number } from 'prop-types';
 import NeoHelper from '../Tools/neoHelper'
 import NNSHelper from '../Tools/nnsHelper'
+import ReactDOM from 'react-dom';
 
 interface AuctionState
 {
@@ -40,7 +41,12 @@ interface InvokeScriptResp{
 
 class DivAuction extends React.Component<any,any> {
     //NNSh = new NNSHelper(this.props.store);
-    //NEOh = new NeoHelper(this.props.store);  
+    //NEOh = new NeoHelper(this.props.store);
+    nnsInput:any
+    constructor(props:any){
+        super(props)
+        this.nnsInput = React.createRef();
+    }  
 
     state = {
         resDataRead : '{}',
@@ -115,7 +121,7 @@ class DivAuction extends React.Component<any,any> {
 
     calcAuctionDay =async (blockIndex:number) =>{
         var startTimeS = (await new NeoHelper(this.props.store).getBlock(blockIndex)).result.time as number
-        return  (new Date().getTime()/1000 - startTimeS)/ 60 / 5  //5分钟1天
+        return  (new Date().getTime()/1000 - startTimeS)/ 60 / this.props.store.auctionMinPerDay  //每天分钟数
     }
 
     getInvokeRead_getBanlance = async () =>{
@@ -166,7 +172,7 @@ class DivAuction extends React.Component<any,any> {
         InvokeReadGroupInput.group.push(invokeRead_auction_getBanlance)
         InvokeReadGroupInput.group.push(invokeRead_auction_getAuctionState)
         
-        //console.log(JSON.stringify(InvokeReadGroupInput,null,2));
+        // console.log(JSON.stringify(InvokeReadGroupInput,null,2));
         
         var resData:InvokeScriptResp = await Teemo.NEO.invokeReadGroup(JSON.parse(JSON.stringify(InvokeReadGroupInput)) as InvokeReadGroup)       
         //console.log(resData.stack[3].value);
@@ -509,6 +515,45 @@ class DivAuction extends React.Component<any,any> {
       return ( 
         <>
             <p>{this.props.title}</p>
+            <Switch checked={this.props.store.auctionMinPerDay == 5?true:false} checkedChildren="*.test" unCheckedChildren="*.neo" defaultChecked onChange={async (e)=>{
+                    console.log(e)
+                    if(e) 
+                    {
+                        this.props.store.updateAuctionMinPerDay(5)
+                        var newNns = this.props.store.nns.replace('.neo','.test')
+                        this.props.store.updateNNS(newNns);
+                        // console.log(this.nnsInput.current)
+                        this.nnsInput.current.state.value = newNns
+                    }
+                    else {
+                        this.props.store.updateAuctionMinPerDay(1440)
+                        var newNns = this.props.store.nns.replace('.test','.neo')
+                        this.props.store.updateNNS(newNns);
+                        this.nnsInput.current.state.value = newNns
+                    }
+
+                    this.setState({
+                        CGASBalance:0,
+                        auctionBalance:0,
+                        bidBalance:0,
+                        auctionStateInfo:{
+                            "id": "",
+                            "auctionStarter": "",
+                            "parenthash": "",
+                            "domain": "",
+                            "domainTTL": "",
+                            "startBlockSelling": 0,
+                            "endBlock": "",
+                            "maxPrice": "",
+                            "maxBuyer": "",
+                            "lastBlock": ""
+                          },
+                        auctionDay:await this.calcAuctionDay(0),
+                        resDataRead:"{}"
+                    })
+                    this.getInvokeRead_getBanlance()                 
+                }} />选择根域(流速{this.props.store.auctionMinPerDay}分钟每天)
+            <Divider /> 
             <Row gutter={16}>
                 <Col span={8}>
                     <Spin tip='等待共识中' spinning={this.state.loadingR}>
@@ -537,7 +582,8 @@ class DivAuction extends React.Component<any,any> {
             {/* <Input placeholder="输入要查询的地址" onChange={this.addrChange.bind(this)} defaultValue={this.props.store.address}/> */}
             {/* <Input placeholder="输入要绑定的NNS" onChange={this.nnsChange.bind(this)} defaultValue={this.props.store.nns}/> */}
             <Input placeholder="输入地址" onChange={(e)=>{this.props.store.updateAddress(e.target.value)}} defaultValue={this.props.store.address}/>
-            <Input placeholder="输入NSS域名" onChange={(e)=>{this.props.store.updateNNS(e.target.value)}} defaultValue={this.props.store.nns}/>
+            <Input ref={this.nnsInput} placeholder="输入NSS域名" onChange={(e)=>{this.props.store.updateNNS(e.target.value)}} defaultValue={this.props.store.nns}/>
+
             <Button onClick={this.butGetInvokeReadClick} type="primary">刷新数据</Button>
             <Divider type="vertical" />
             <Button onClick={this.butInvoke_doStartAuction_click}>开标</Button>           
