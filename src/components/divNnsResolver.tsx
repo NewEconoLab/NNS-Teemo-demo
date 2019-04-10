@@ -53,7 +53,7 @@ class DivNnsResolver extends React.Component<any,any> {
         //console.log(resolverData);
 
         this.setState({
-            resData:NeoHelper.hex2a(resolverData.stack[0].value)==''?'未映射':NeoHelper.hex2a(resolverData.stack[0].value)                                 
+            resData:NeoHelper.hexToString(resolverData.stack[0].value)==''?'未映射':NeoHelper.hexToString(resolverData.stack[0].value)                                 
         });
     }
 

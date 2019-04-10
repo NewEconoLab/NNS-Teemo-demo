@@ -112,6 +112,12 @@ class App extends Component<any,any> {
                 <span className="nav-text">NNS Credit</span>
               </Link>
             </Menu.Item>
+            <Menu.Item key="6">
+              <Link to='/nfttest'>
+                <Icon type="file" />
+                <span className="nav-text">NFT Test</span>
+              </Link>
+            </Menu.Item>
           </Menu>
         </Sider>
         <Layout>

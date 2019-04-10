@@ -74,7 +74,7 @@ class DivNnsCredit extends React.Component<any,any> {
                 fullDomainName:stack0[1].value,
                 TTL:stack0[2].value,
             }
-            creditInfo.fullDomainName = NeoHelper.hex2a(creditInfo.fullDomainName)
+            creditInfo.fullDomainName = NeoHelper.hexToString(creditInfo.fullDomainName)
             creditInfo.TTL = NeoHelper.hex2TimeStr(creditInfo.TTL)
     
             this.setState({
@@ -116,6 +116,8 @@ class DivNnsCredit extends React.Component<any,any> {
         this.setState({
             loadingW:true                                
         });
+
+        console.log(JSON.stringify(invoke_credit_authenticate,null,2))
 
         var invokeCreditAuthenticateResp:InvokeOutput = await Teemo.NEO.invoke(JSON.parse(JSON.stringify(invoke_credit_authenticate)) as InvokeArgs)
 

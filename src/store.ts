@@ -25,9 +25,11 @@ class Store {
             nns_domaincenter : "348387116c4a75e420663277d9c02049907128c7",
             nns_resolver : "6e2aea28af9c5febea0774759b1b76398e3167f1",
             nns_auction: this.nns_auction_hash,
-            nns_credit : "77bf387c9b5f2e2c33ef8507478b103285c55b11",
+            nns_credit : "960b41a05588d2f55acbc13a1e3aa464eec6fff5",
             NEP_5_CGAS:"74f2dc36a68fdc4682034178eb2220729231db76",
-            NEP_5_NNC:"fc732edee1efdf968c23c20a9628eaa5a6ccb934"
+            NEP_5_NNC:"fc732edee1efdf968c23c20a9628eaa5a6ccb934",
+            NFT_test_O3Foundry:"7fe1d36ed60846975e70ec8b6fc0bef08b033107",
+            NFT_test_HashPuppies:"e7b2046b2412c4c7f1531ce144a73d47c3b272fe"
         }
     } 
 
@@ -44,13 +46,13 @@ class Store {
         this.nns = nns
     }
     @computed get rpcUrl(){
-        if(this.network=='MainNet') return 'http://seed.nel.group:10332'
-        else return 'http://test.nel.group:20332'
+        if(this.network=='MainNet') return 'https://seed.nel.group:10331'
+        else return 'https://test.nel.group:20331'
     }
 
     @computed get webSocketURL(){
-        if(this.network=='MainNet') return 'ws://47.99.35.147:82/ws/mainnet'
-        else return 'ws://47.99.35.147:82/ws/testnet'
+        if(this.network=='MainNet') return 'wss://testws.nel.group/ws/mainnet'
+        else return 'wss://testws.nel.group/ws/testnet'
     }
 
     updateLastWSmsgSec = () =>{     

@@ -199,7 +199,7 @@ class DivAuction extends React.Component<any,any> {
                 lastBlock:stack2[9].value//最后出价块
             }
             AuctionStateInfo.auctionStarter = await Teemo.NEO.getAddressFromScriptHash(NeoHelper.hexReverse(AuctionStateInfo.auctionStarter))
-            AuctionStateInfo.domain = NeoHelper.hex2a(AuctionStateInfo.domain)
+            AuctionStateInfo.domain = NeoHelper.hexToString(AuctionStateInfo.domain)
             AuctionStateInfo.domainTTL = NeoHelper.hex2TimeStr(AuctionStateInfo.domainTTL)
             AuctionStateInfo.maxPrice = AuctionStateInfo.maxPrice/10**8
             if(AuctionStateInfo.maxBuyer != ''){

@@ -28,13 +28,21 @@ class NeoHelper {
       return data;
     }
 
-    public static hex2a = (hexx:string) => {
-        var hex = hexx.toString();//force conversion
-        var str = '';
-        for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
-            str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-        return str;
-    }
+    // public static hex2a = (hexx:string) => {
+    //     var hex = hexx.toString();//force conversion
+    //     var str = '';
+    //     for (var i = 0; (i < hex.length && hex.substr(i, 2) !== '00'); i += 2)
+    //         str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    //     return str;
+    // }
+
+    public static hexToString = (hex:string) => {
+      var string = '';
+      for (var i = 0; i < hex.length; i += 2) {
+        string += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+      }
+      return string;
+  }
 
     public static hex2Int = (hexx:string) =>{
       if(hexx=='') return 0

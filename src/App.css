@@ -6,6 +6,12 @@
   margin: 16px;
 }
 
+.wrap {
+  width: 500px;
+  word-wrap:break-word; 
+  word-break:normal;
+}
+
 .App {
   text-align: center;
 }
