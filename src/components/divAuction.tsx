@@ -87,25 +87,9 @@ class DivAuction extends React.Component<any,any> {
             })           
         },1000)
 
-        this.getInvokeRead_getBanlance()
-
-        // console.log("teemoReady:" ,this.props.teemoReady)
-        // if(this.props.teemoReady)
-        // {
-        //     console.log(1)
-        //     this.getInvokeRead_getBanlance()
-        // }
-        // else{
-        //     console.log(0)
-        //     var intervalID = setInterval(()=>{
-        //         console.log("teemoReady:" ,this.props.teemoReady)
-        //         if(this.props.teemoReady)
-        //         {
-        //             setTimeout(()=>{this.getInvokeRead_getBanlance()},1000)                   
-        //             clearInterval(intervalID)
-        //         }               
-        //     },1000) 
-        // }      
+        if(this.props.store.isTeemoReady){
+            this.getInvokeRead_getBanlance()
+        }     
 
         window.addEventListener ("newBlockEvent", this.doOnEvent, false)
     }

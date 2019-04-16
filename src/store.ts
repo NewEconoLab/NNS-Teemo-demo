@@ -5,7 +5,7 @@ import NeoHelper from './Tools/neoHelper';
 class Store {
     constructor(){
         this.init()
-        setInterval(this.updateLastWSmsgSec,1000)
+        // setInterval(this.updateLastWSmsgSec,1000)
     }
 
     @observable isTeemoReady = false
@@ -145,33 +145,37 @@ class Store {
             this.time = new Date().getTime()
             //console.log(timeDiff.toString() + 'ms')
             var data = JSON.parse(event.data).data
-            if(data.blockHeight != null){
-                var txidIndex = -1
-                if(this.txids.length>0){                  
-                    txidIndex = data.tx.findIndex((element:any)=>{
-                        return element.txid === this.txids[0]
-                    })
-                    //console.log({txid:this.txids[0]},data.tx,txidIndex)
-                }
-                notification.info({message:data.blockHeight,description:'delay: ' + this.getDelay(data.blockTime) + '/' + this.getDelay(data.blockInsertTime) + '/' + this.getDelay(data.svrSystemTime) + '||txidIndex:' + txidIndex})
+            this.analysisNewBlock(data)
+        }
+    }
 
-                var blockHeightDataArray = this.blockDatas
-
-                if(blockHeightDataArray[0].blockHeight == -1 ) blockHeightDataArray.shift()
-                if(blockHeightDataArray.length>=50) blockHeightDataArray.pop()
-
-                let timeDiff = 0
-                if(blockHeightDataArray.length > 0) timeDiff = (data.blockTime - blockHeightDataArray[0].blockTime)
-                let blockData = data // {height:data.blockHeight,time:data.blockTime,hash:data.blockHash,timeDiff:timeDiff}
-                blockData['timeDiff'] = timeDiff
-                blockData['txidIndex'] = txidIndex
-                blockData['txCount'] = data.tx.length
-                blockHeightDataArray.unshift(blockData)
-                this.pushEvent('newBlockEvent',blockData)            
-        
-                this.blockDatas = blockHeightDataArray
-                this.lastBlockTime = data.blockTime
+    analysisNewBlock=(newBlock:any)=>{
+        if(newBlock.blockHeight != null){
+            var txidIndex = -1
+            if(this.txids.length>0){                  
+                txidIndex = newBlock.tx.findIndex((element:any)=>{
+                    return element.txid === this.txids[0]
+                })
+                //console.log({txid:this.txids[0]},newBlock.tx,txidIndex)
             }
+            notification.info({message:newBlock.blockHeight,description:'delay: ' + this.getDelay(newBlock.blockTime) + '/' + this.getDelay(newBlock.blockInsertTime) + '/' + this.getDelay(newBlock.svrSystemTime) + '||txidIndex:' + txidIndex})
+
+            var blockHeightDataArray = this.blockDatas
+
+            if(blockHeightDataArray[0].blockHeight == -1 ) blockHeightDataArray.shift()
+            if(blockHeightDataArray.length>=50) blockHeightDataArray.pop()
+
+            let timeDiff = 0
+            if(blockHeightDataArray.length > 0) timeDiff = (newBlock.blockTime - blockHeightDataArray[0].blockTime)
+            let blockData = newBlock // {height:newBlock.blockHeight,time:newBlock.blockTime,hash:newBlock.blockHash,timeDiff:timeDiff}
+            blockData['timeDiff'] = timeDiff
+            blockData['txidIndex'] = txidIndex
+            blockData['txCount'] = newBlock.tx.length
+            blockHeightDataArray.unshift(blockData)
+            this.pushEvent('newBlockEvent',blockData)            
+    
+            this.blockDatas = blockHeightDataArray
+            this.lastBlockTime = newBlock.blockTime
         }
     }
 
@@ -197,8 +201,23 @@ class Store {
 
             this.updateNetwork((await Teemo.NEO.getNetworks()).defaultNetwork)          
 
-            this.socketInit()
+            // this.socketInit()
 
+        })
+
+        //块高度变化事件
+        window.addEventListener('Teemo.NEO.BLOCK_HEIGHT_CHANGED',(data:any)=>{
+            console.log("inject BLOCK_HEIGHT_CHANGED");
+            // notification.success({message:'Teemo',description:'Teemo.NEO.BLOCK_HEIGHT_CHANGED'})
+            // console.log(JSON.parse(data.detail).data)
+            this.analysisNewBlock(JSON.parse(data.detail).data)
+        })
+
+        //交易共识确认事件
+        window.addEventListener('Teemo.NEO.TRANSACTION_CONFIRMED',(data:any)=>{
+            console.log("inject TRANSACTION_CONFIRMED ");
+            notification.success({message:'Teemo',description:'Teemo.NEO.TRANSACTION_CONFIRMED'})
+            console.log(JSON.stringify(data.detail))
         })
 
         window.addEventListener('Teemo.NEO.NETWORK_CHANGED',(data:any)=>{
@@ -206,7 +225,14 @@ class Store {
             console.log(data);
 
             this.updateNetwork(data.detail.defaultNetwork)
-            this.socketInit()
+
+            this.blockDatas=[{
+                blockHeight:-1,
+                blockTime:0,
+                blockHash:'',
+                timeDiff:0
+              }]
+            // this.socketInit()
         })
 
         window.addEventListener('Teemo.NEO.CONNECTED',async (data:any)=>{
