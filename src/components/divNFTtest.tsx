@@ -164,16 +164,16 @@ class DivNFTtest extends React.Component<any,any> {
 
         let allowanceStr = result.stack[0].value
         let allowance1 = allowanceStr.substr(0,40)
-        if(allowance1.length>0) allowance1 = await Teemo.NEO.getAddressFromScriptHash(NeoHelper.hexReverse(allowance1))
+        if(allowance1.length>0) allowance1 = await Teemo.NEO.TOOLS.getAddressFromScriptHash(allowance1)
         let allowance2 = allowanceStr.substr(40)
-        if(allowance2.length>0) allowance2 = await Teemo.NEO.getAddressFromScriptHash(NeoHelper.hexReverse(allowance2))
+        if(allowance2.length>0) allowance2 = await Teemo.NEO.TOOLS.getAddressFromScriptHash(allowance2)
         allowanceStr = allowance1 + " >>> " + allowance2
 
         this.setState({
             tempToken:{
                 tokenID:tokenID,
                 allowance:allowanceStr,// + "|" + allowance1 + "|" + allowance2,
-                ownerOf:await Teemo.NEO.getAddressFromScriptHash(NeoHelper.hexReverse(result.stack[1].value)),
+                ownerOf:await Teemo.NEO.TOOLS.getAddressFromScriptHash(result.stack[1].value),
                 properties:NeoHelper.hexToString(result.stack[2].value),
                 rwProperties:NeoHelper.hexToString(result.stack[3].value),
                 token:result.stack[4].value,
@@ -184,7 +184,7 @@ class DivNFTtest extends React.Component<any,any> {
         return {
             tokenID:tokenID,
             allowance:allowanceStr,// + "|" + allowance1 + "|" + allowance2,
-            ownerOf:await Teemo.NEO.getAddressFromScriptHash(NeoHelper.hexReverse(result.stack[1].value)),
+            ownerOf:await Teemo.NEO.TOOLS.getAddressFromScriptHash(result.stack[1].value),
             properties:NeoHelper.hexToString(result.stack[2].value),
             rwProperties:NeoHelper.hexToString(result.stack[3].value),
             token:result.stack[4].value,

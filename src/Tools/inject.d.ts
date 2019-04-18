@@ -33,7 +33,20 @@ declare enum Command {
     invokeGroup = "invokeGroup",
     event = "event",
     disconnect = "disconnect",
-    getAddressFromScriptHash = "getAddressFromScriptHash"
+    getAddressFromScriptHash = "getAddressFromScriptHash",
+    getBlock = "getBlock",
+    getTransaction = "getTransaction",
+    getApplicationLog = "getApplicationLog",
+    TOOLS_validateAddress = "TOOLS.validateAddress",
+    TOOLS_getAddressFromScriptHash = "TOOLS.getAddressFromScriptHash",
+    TOOLS_getStringFromHexstr = "TOOLS.getStringFromHexstr",
+    TOOLS_getBigIntegerFromHexstr = "TOOLS.getBigIntegerFromHexstr",
+    TOOLS_reverseHexstr = "TOOLS.reverseHexstr",
+    TOOLS_getBigIntegerFromAssetAmount = "TOOLS.getBigIntegerFromAssetAmount",
+    TOOLS_getDecimalsFromAssetAmount = "TOOLS.getDecimalsFromAssetAmount",
+    NNS_getNamehashFromDomain = "NNS.getNamehashFromDomain",
+    NNS_getAddressFromDomain = "NNS.getAddressFromDomain",
+    NNS_getDomainFromAddress = "NNS.getDomainFromAddress"
 }
 declare enum EventName {
     READY = "READY",
@@ -111,6 +124,22 @@ interface InvokeGroup {
 }
 interface InvokeGroupOutup {
 }
+/**
+ * @param {number} blockHeight 区块高度
+ * @param {string} network 网络
+ */
+interface GetBlockArgs {
+    blockHeight: number;
+    network: string;
+}
+interface GetTransactionArgs {
+    txid: string;
+    network: string;
+}
+interface GetApplicationLogArgs {
+    txid: string;
+    network: string;
+}
 interface BalanceRequest {
     address: string;
     assets?: string[];
@@ -169,6 +198,24 @@ interface InvokeReadInput {
     args?: Argument[];
     network: string;
 }
+interface GetBigIntegerFromAssetAmountArgs {
+    amount: string;
+    assetID: string;
+    network: 'MainNet' | 'TestNet';
+}
+interface GetDecimalsFromAssetAmountArgs {
+    amount: string;
+    assetID: string;
+    network: 'MainNet' | 'TestNet';
+}
+interface DomainArgs {
+    domain: string;
+    network: 'MainNet' | 'TestNet';
+}
+interface AddressArgs {
+    address: string;
+    network: 'MainNet' | 'TestNet';
+}
 declare const ids: any[];
 /**
  *
@@ -220,10 +267,54 @@ declare namespace Teemo {
         static invokeRead(params: InvokeReadInput): Promise<any>;
         static invokeReadGroup(params: InvokeReadGroup): Promise<any>;
         /**
-         * 根据scriptHash获得Address
-         * @param params scriptHash
+         * 查询区块信息
+         * @param params
          */
-        static getAddressFromScriptHash(params: string): Promise<string>;
+        static getBlock(params: GetBlockArgs): Promise<{}>;
+        /**
+         * 查询交易信息
+         * @param params
+         */
+        static getTransaction(params: GetTransactionArgs): Promise<{}>;
+        /**
+         * 查询log
+         * @param params
+         */
+        static getApplicationLog(params: GetApplicationLogArgs): Promise<{}>;
+        static TOOLS: {
+            /**
+             * 验证地址
+             * @param address 要验证的地址
+             */
+            validateAddress: (address: string) => Promise<{}>;
+            /**
+             * scriptHash转地址
+             * @param scriptHash 要转换成地址的ScriptHash
+             */
+            getAddressFromScriptHash: (scriptHash: string) => Promise<string>;
+            /**
+             * HexStr转String
+             * @param hex hex字符串
+             */
+            getStringFromHexstr: (hex: string) => Promise<string>;
+            /**
+             * HexStr 转 BigInteger
+             * @param hex hex字符串
+             */
+            getBigIntegerFromHexstr: (hex: string) => Promise<string>;
+            /**
+             * Hex 反转
+             * @param hex hex字符串
+             */
+            reverseHexstr: (hex: string) => Promise<string>;
+            getBigIntegerFromAssetAmount: (params: GetBigIntegerFromAssetAmountArgs) => Promise<string>;
+            getDecimalsStrFromAssetAmount: (params: GetDecimalsFromAssetAmountArgs) => Promise<string>;
+        };
+        static NNS: {
+            getNamehashFromDomain: (params: string) => Promise<{}>;
+            getAddressFromDomain: (params: DomainArgs) => Promise<{}>;
+            getDomainFromAddress: (params: AddressArgs) => Promise<{}>;
+        };
     }
 }
 declare const EventChange: () => void;

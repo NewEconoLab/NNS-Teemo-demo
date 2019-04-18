@@ -43,6 +43,7 @@ class DivNnsCenter extends React.Component<any,any> {
     }
 
     butGetInvokeReadClick = async (e:any) => {
+        console.log(await new NNSHelper(this.props.store).namehash(this.props.store.nns))
         let invokeGetOwnerInfo =  {
             "scriptHash": this.props.store.scriptHash.nns_domaincenter,
             "operation": "getOwnerInfo",
@@ -70,7 +71,7 @@ class DivNnsCenter extends React.Component<any,any> {
         }
         nnsOwnerInfo.domain = NeoHelper.hexToString(nnsOwnerInfo.domain)
         nnsOwnerInfo.TTL = NeoHelper.hex2TimeStr(nnsOwnerInfo.TTL)
-        if(nnsOwnerInfo.owner != '') nnsOwnerInfo.owner = await Teemo.NEO.getAddressFromScriptHash(NeoHelper.byte2Hex(NeoHelper.hex2Byte(nnsOwnerInfo.owner).reverse()))
+        if(nnsOwnerInfo.owner != '') nnsOwnerInfo.owner = await Teemo.NEO.TOOLS.getAddressFromScriptHash(nnsOwnerInfo.owner)
         this.setState({
             resData: JSON.stringify(nnsOwnerInfo, null, 2)                                 
         });

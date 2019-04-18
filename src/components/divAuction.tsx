@@ -182,12 +182,12 @@ class DivAuction extends React.Component<any,any> {
                 maxBuyer:stack2[8].value,//最大出价者
                 lastBlock:stack2[9].value//最后出价块
             }
-            AuctionStateInfo.auctionStarter = await Teemo.NEO.getAddressFromScriptHash(NeoHelper.hexReverse(AuctionStateInfo.auctionStarter))
+            AuctionStateInfo.auctionStarter = await Teemo.NEO.TOOLS.getAddressFromScriptHash(AuctionStateInfo.auctionStarter)
             AuctionStateInfo.domain = NeoHelper.hexToString(AuctionStateInfo.domain)
             AuctionStateInfo.domainTTL = NeoHelper.hex2TimeStr(AuctionStateInfo.domainTTL)
             AuctionStateInfo.maxPrice = AuctionStateInfo.maxPrice/10**8
             if(AuctionStateInfo.maxBuyer != ''){
-                AuctionStateInfo.maxBuyer = await Teemo.NEO.getAddressFromScriptHash(NeoHelper.hexReverse(AuctionStateInfo.maxBuyer))
+                AuctionStateInfo.maxBuyer = await Teemo.NEO.TOOLS.getAddressFromScriptHash(AuctionStateInfo.maxBuyer)
             }      
 
             //---第二轮invokescript
@@ -234,7 +234,7 @@ class DivAuction extends React.Component<any,any> {
             "operation": "transfer",
             "arguments": [
                 {"type":"Address","value":this.props.store.address},
-                {"type":"Address","value":await Teemo.NEO.getAddressFromScriptHash(this.props.store.scriptHash.nns_auction)},
+                {"type":"Address","value":await Teemo.NEO.TOOLS.getAddressFromScriptHash(NeoHelper.hexReverse(this.props.store.scriptHash.nns_auction))},
                 {"type":"Integer","value":this.state.CGASopValue * (10**8)}
             ],
             "fee":"0",
