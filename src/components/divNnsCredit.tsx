@@ -4,7 +4,6 @@ import {Button,Input,Spin} from 'antd';
 import { async } from 'q';
 import { any, number } from 'prop-types';
 import NeoHelper from '../Tools/neoHelper'
-import NNSHelper from '../Tools/nnsHelper'
 import {inject,observer} from 'mobx-react'
 
 interface NNScredit
@@ -74,9 +73,13 @@ class DivNnsCredit extends React.Component<any,any> {
                 fullDomainName:stack0[1].value,
                 TTL:stack0[2].value,
             }
-            creditInfo.fullDomainName = NeoHelper.hexToString(creditInfo.fullDomainName)
-            creditInfo.TTL = NeoHelper.hex2TimeStr(creditInfo.TTL)
-    
+            //console.log(creditInfo.namehash)
+            if(creditInfo.namehash)
+            {
+                creditInfo.fullDomainName = await Teemo.NEO.TOOLS.getStringFromHexstr(creditInfo.fullDomainName)
+                creditInfo.TTL = NeoHelper.timetrans(Number(await Teemo.NEO.TOOLS.getBigIntegerFromHexstr(creditInfo.TTL)))
+            }  
+
             this.setState({
                 resDataRead:JSON.stringify(creditInfo, null, 2),
                 loadingR:false                                 

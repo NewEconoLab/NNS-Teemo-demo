@@ -5,8 +5,6 @@ import React, { Component } from 'react';
 import {Button,Input,Divider,Drawer,Popover,Card,Icon} from 'antd';
 import { async, timeout } from 'q';
 import { any, number } from 'prop-types';
-import NeoHelper from '../Tools/neoHelper'
-import NNSHelper from '../Tools/nnsHelper'
 
 import {inject,observer} from 'mobx-react';
 import Item, { Meta } from 'antd/lib/list/Item';
@@ -129,9 +127,9 @@ class DivNFTtest extends React.Component<any,any> {
         // console.log(result)
         this.setState({
             // resData:JSON.stringify(result,null,2),
-            name:NeoHelper.hexToString(result.stack[0].value),
-            symbol:NeoHelper.hexToString(result.stack[1].value),
-            supportedStandards:NeoHelper.hexToString(result.stack[2].value),//.replace('80010006','')),
+            name:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[0].value),
+            symbol:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[1].value),
+            supportedStandards:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[2].value),//.replace('80010006','')),
             totalSupply:parseInt('0x' + result.stack[3].value),
             tokens:NFTDataArray,
             loadingR:false
@@ -174,10 +172,10 @@ class DivNFTtest extends React.Component<any,any> {
                 tokenID:tokenID,
                 allowance:allowanceStr,// + "|" + allowance1 + "|" + allowance2,
                 ownerOf:await Teemo.NEO.TOOLS.getAddressFromScriptHash(result.stack[1].value),
-                properties:NeoHelper.hexToString(result.stack[2].value),
-                rwProperties:NeoHelper.hexToString(result.stack[3].value),
+                properties:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[2].value),
+                rwProperties:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[3].value),
                 token:result.stack[4].value,
-                uri:NeoHelper.hexToString(result.stack[5].value) 
+                uri:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[5].value) 
             }
         })
 
@@ -185,10 +183,10 @@ class DivNFTtest extends React.Component<any,any> {
             tokenID:tokenID,
             allowance:allowanceStr,// + "|" + allowance1 + "|" + allowance2,
             ownerOf:await Teemo.NEO.TOOLS.getAddressFromScriptHash(result.stack[1].value),
-            properties:NeoHelper.hexToString(result.stack[2].value),
-            rwProperties:NeoHelper.hexToString(result.stack[3].value),
+            properties:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[2].value),
+            rwProperties:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[3].value),
             token:result.stack[4].value,
-            uri:NeoHelper.hexToString(result.stack[5].value) 
+            uri:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[5].value) 
         }
     }
 
@@ -222,7 +220,7 @@ class DivNFTtest extends React.Component<any,any> {
         let result:any = await Teemo.NEO.invokeRead(JSON.parse(JSON.stringify(input))) as InvokeReadInput
 
         this.setState({
-            resData:JSON.stringify(result,null,2),
+            // resData:JSON.stringify(result,null,2),
             // balanceOf:result.stack[0].value
         })
     }

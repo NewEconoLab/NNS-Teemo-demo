@@ -3,10 +3,9 @@ import {autorun, observe} from 'mobx'
 import {Button,Input,Spin,Statistic, Row, Col, Icon,Timeline,Drawer,Switch,InputNumber,Divider} from 'antd';
 import { async } from 'q';
 import { any, number } from 'prop-types';
-import NeoHelper from '../Tools/neoHelper'
-import NNSHelper from '../Tools/nnsHelper'
 import ReactDOM from 'react-dom';
 import {inject,observer} from 'mobx-react'
+import NeoHelper from '../Tools/neoHelper';
 
 interface AuctionState
 {
@@ -107,8 +106,26 @@ class DivAuction extends React.Component<any,any> {
     }
 
     calcAuctionDay =async (blockIndex:number) =>{
-        var startTimeS = (await new NeoHelper(this.props.store).getBlock(blockIndex)).result.time as number
-        return  (new Date().getTime()/1000 - startTimeS)/ 60 / this.props.store.auctionMinPerDay  //每天分钟数
+        if(this.props.store.isTeemoReady){
+            var block = (await Teemo.NEO.getBlock({
+                "blockHeight": parseInt(blockIndex.toString()),  
+                "network": this.props.store.network
+            })) as any
+            var startTimeS = block.time as number
+            return  (new Date().getTime()/1000 - startTimeS)/ 60 / this.props.store.auctionMinPerDay  //每天分钟数
+        }
+        else{
+            return 0;
+        }
+    }
+
+    getDecimalsStrFromAssetAmount = async (bigIngterAmount:string,assetID:string) =>
+    {
+        return await Teemo.NEO.TOOLS.getDecimalsStrFromAssetAmount({
+            "amount":bigIngterAmount,
+            "assetID":assetID,
+            "network":this.props.store.network
+        })
     }
 
     getInvokeRead_getBanlance = async () =>{
@@ -132,7 +149,7 @@ class DivAuction extends React.Component<any,any> {
             "scriptHash": this.props.store.scriptHash.nns_auction,
             "operation": "getAuctionStateByFullhash",
             "arguments": [
-                {"type":"ByteArray","value":await new NNSHelper(this.props.store).namehash(this.props.store.nns)}
+                {"type":"ByteArray","value":await Teemo.NEO.NNS.getNamehashFromDomain(this.props.store.nns)}
             ],
             "network": this.props.store.network
         }        
@@ -163,7 +180,7 @@ class DivAuction extends React.Component<any,any> {
         
         var resData:InvokeScriptResp = await Teemo.NEO.invokeReadGroup(JSON.parse(JSON.stringify(InvokeReadGroupInput)) as InvokeReadGroup)       
         //console.log(resData.stack[3].value);
-        //console.log(resData)
+        // console.log(resData)
 
         if(resData.stack[0] != null){
             //console.log('stack',resData.stack)
@@ -183,10 +200,10 @@ class DivAuction extends React.Component<any,any> {
                 lastBlock:stack2[9].value//最后出价块
             }
             AuctionStateInfo.auctionStarter = await Teemo.NEO.TOOLS.getAddressFromScriptHash(AuctionStateInfo.auctionStarter)
-            AuctionStateInfo.domain = NeoHelper.hexToString(AuctionStateInfo.domain)
-            AuctionStateInfo.domainTTL = NeoHelper.hex2TimeStr(AuctionStateInfo.domainTTL)
+            AuctionStateInfo.domain = await Teemo.NEO.TOOLS.getStringFromHexstr(AuctionStateInfo.domain)
+            AuctionStateInfo.domainTTL =NeoHelper.timetrans(Number(await Teemo.NEO.TOOLS.getBigIntegerFromHexstr(AuctionStateInfo.domainTTL)))
             AuctionStateInfo.maxPrice = AuctionStateInfo.maxPrice/10**8
-            if(AuctionStateInfo.maxBuyer != ''){
+            if(AuctionStateInfo.maxBuyer.length == 40){
                 AuctionStateInfo.maxBuyer = await Teemo.NEO.TOOLS.getAddressFromScriptHash(AuctionStateInfo.maxBuyer)
             }      
 
@@ -200,14 +217,33 @@ class DivAuction extends React.Component<any,any> {
             //console.log('AuctionStateInfo',AuctionStateInfo)
 
             //var CGAS_balacnce = resData.stack[0].value
-            //console.log(NeoHelper.hex2Int(CGAS_balacnce)/10**8)
+            //console.log(NeoHelper.Teemo.NEO.TOOLS.getBigIntegerFromHexstr(CGAS_balacnce)/10**8)
+
+            // console.log(resData.stack[0].value + "|" + resData.stack[1].value + "|" + resData2.stack[0].value + "|")
+            // console.log(await Teemo.NEO.TOOLS.getBigIntegerFromHexstr(resData.stack[0].value))
+
+            var CGASBalance = resData.stack[0].value
+            var auctionBalance = resData.stack[1].value
+            var bidBalance = resData2.stack[0].value
+
+            CGASBalance = await Teemo.NEO.TOOLS.getBigIntegerFromHexstr(CGASBalance)
+            CGASBalance = await this.getDecimalsStrFromAssetAmount(CGASBalance,this.props.store.scriptHash.NEP_5_CGAS)           
+            auctionBalance = await Teemo.NEO.TOOLS.getBigIntegerFromHexstr(auctionBalance)
+            auctionBalance = await this.getDecimalsStrFromAssetAmount(auctionBalance,this.props.store.scriptHash.NEP_5_CGAS)
+            if(bidBalance.length>0){
+                bidBalance = await Teemo.NEO.TOOLS.getBigIntegerFromHexstr(bidBalance)
+                bidBalance = await this.getDecimalsStrFromAssetAmount(bidBalance,this.props.store.scriptHash.NEP_5_CGAS)
+            }
+            else{
+                bidBalance = '0'
+            }
 
             this.setState({
-                CGASBalance:NeoHelper.hex2Int(resData.stack[0].value)/10**8,
-                auctionBalance:NeoHelper.hex2Int(resData.stack[1].value)/10**8,
-                bidBalance:NeoHelper.hex2Int(resData2.stack[0].value)/10**8,
+                CGASBalance:CGASBalance,
+                auctionBalance:auctionBalance,
+                bidBalance:bidBalance,
                 auctionStateInfo:AuctionStateInfo,
-                auctionDay:await this.calcAuctionDay(AuctionStateInfo.startBlockSelling),
+                auctionDay: 0 ,//await this.calcAuctionDay(AuctionStateInfo.startBlockSelling),
                 resDataRead:JSON.stringify(AuctionStateInfo,null,2),
                 loadingR:false
             })
@@ -234,7 +270,7 @@ class DivAuction extends React.Component<any,any> {
             "operation": "transfer",
             "arguments": [
                 {"type":"Address","value":this.props.store.address},
-                {"type":"Address","value":await Teemo.NEO.TOOLS.getAddressFromScriptHash(NeoHelper.hexReverse(this.props.store.scriptHash.nns_auction))},
+                {"type":"Address","value":await Teemo.NEO.TOOLS.getAddressFromScriptHash(await Teemo.NEO.TOOLS.reverseHexstr(this.props.store.scriptHash.nns_auction))},
                 {"type":"Integer","value":this.state.CGASopValue * (10**8)}
             ],
             "fee":"0",
@@ -321,7 +357,7 @@ class DivAuction extends React.Component<any,any> {
             "operation": "startAuction",
             "arguments": [
                 {"type":"Address","value":this.props.store.address},
-                {"type":"ByteArray","value":await new NNSHelper(this.props.store).namehash(this.props.store.nns.split('.')[1])},
+                {"type":"ByteArray","value":await Teemo.NEO.NNS.getNamehashFromDomain(this.props.store.nns.split('.')[1])},
                 {"type":"String","value":this.props.store.nns.split('.')[0]}
             ],
             "fee":"0",
@@ -445,7 +481,7 @@ class DivAuction extends React.Component<any,any> {
             "operation": "renewDomain",
             "arguments": [
                 {"type":"Address","value":this.props.store.address},
-                {"type":"ByteArray","value":await new NNSHelper(this.props.store).namehash(this.props.store.nns.split('.')[1])},
+                {"type":"ByteArray","value":await Teemo.NEO.NNS.getNamehashFromDomain(this.props.store.nns.split('.')[1])},
                 {"type":"String","value":this.props.store.nns.split('.')[0]}
             ],
             "fee":"0",
@@ -575,7 +611,7 @@ class DivAuction extends React.Component<any,any> {
             <Divider type="vertical" />
             <Button onClick={this.butInvoke_doStartAuction_click}>开标</Button>           
             <Divider type="vertical" />
-            <InputNumber min={0} max={this.state.auctionBalance} step={0.1} onChange={this.amountChange.bind(this)} />=>
+            <InputNumber min={0} max={Number(this.state.auctionBalance)} step={0.1} onChange={this.amountChange.bind(this)} />=>
             <Button onClick={this.butInvoke_doBid_click}>加价</Button> 
             <Divider type="vertical" /> 
             <Button onClick={this.butInvoke_doBidSettlementAndCollect_click}>结算与领取</Button>

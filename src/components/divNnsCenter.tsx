@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import {Button,Input} from 'antd';
+import {Button,Input, Card, Tag} from 'antd';
 import { async } from 'q';
 import { any, number } from 'prop-types';
-import NeoHelper from '../Tools/neoHelper'
-import NNSHelper from '../Tools/nnsHelper'
 import {inject,observer} from 'mobx-react';
+import NeoHelper from '../Tools/neoHelper';
 
 interface OwnerInfo
 {
@@ -35,7 +34,18 @@ class DivNnsCenter extends React.Component<any,any> {
     // NNSh = new NNSHelper(this.props.store); 
 
     state = {
-        resData : '{}'
+        resData : {
+            owner:'',
+            register:'',
+            resolver:'',
+            TTL:'',
+            parentOwner:'',
+            domain:'',
+            parenthash:'',
+            root:'',
+        },
+        isExpired:false,
+        isloading:true
     }
 
     componentDidMount(){
@@ -43,12 +53,14 @@ class DivNnsCenter extends React.Component<any,any> {
     }
 
     butGetInvokeReadClick = async (e:any) => {
-        console.log(await new NNSHelper(this.props.store).namehash(this.props.store.nns))
+        this.setState({isloading:true})
+
+        console.log(await Teemo.NEO.NNS.getNamehashFromDomain(this.props.store.nns))
         let invokeGetOwnerInfo =  {
             "scriptHash": this.props.store.scriptHash.nns_domaincenter,
             "operation": "getOwnerInfo",
             "arguments": [
-                {"type":"ByteArray","value":await new NNSHelper(this.props.store).namehash(this.props.store.nns)},
+                {"type":"ByteArray","value":await Teemo.NEO.NNS.getNamehashFromDomain(this.props.store.nns)},
             ],
             "network": this.props.store.network
         } 
@@ -69,11 +81,22 @@ class DivNnsCenter extends React.Component<any,any> {
             parenthash:stack0[6].value,
             root:stack0[7].value,
         }
-        nnsOwnerInfo.domain = NeoHelper.hexToString(nnsOwnerInfo.domain)
-        nnsOwnerInfo.TTL = NeoHelper.hex2TimeStr(nnsOwnerInfo.TTL)
+        nnsOwnerInfo.domain =await Teemo.NEO.TOOLS.getStringFromHexstr(nnsOwnerInfo.domain)
+        var ttl = Number(await Teemo.NEO.TOOLS.getBigIntegerFromHexstr(nnsOwnerInfo.TTL))
+        nnsOwnerInfo.TTL = NeoHelper.timetrans(ttl)
         if(nnsOwnerInfo.owner != '') nnsOwnerInfo.owner = await Teemo.NEO.TOOLS.getAddressFromScriptHash(nnsOwnerInfo.owner)
+        if(nnsOwnerInfo.register != '') nnsOwnerInfo.register = await Teemo.NEO.TOOLS.reverseHexstr(nnsOwnerInfo.register)
+        if(nnsOwnerInfo.resolver != '') nnsOwnerInfo.resolver = await Teemo.NEO.TOOLS.reverseHexstr(nnsOwnerInfo.resolver)
+        if(nnsOwnerInfo.parentOwner != '') nnsOwnerInfo.parentOwner = await Teemo.NEO.TOOLS.getAddressFromScriptHash(nnsOwnerInfo.parentOwner)
+
+        var isExpiredV = false;
+        var nowtime = Number((new Date().getTime()/1000).toFixed(0))
+        if(Number(ttl)<nowtime) isExpiredV = true
+
         this.setState({
-            resData: JSON.stringify(nnsOwnerInfo, null, 2)                                 
+            resData: nnsOwnerInfo,
+            isExpired:isExpiredV,
+            isloading:false                          
         });
 
         //this.invokeRead(JSON.stringify(invokeRead3))
@@ -92,7 +115,23 @@ class DivNnsCenter extends React.Component<any,any> {
             {/* <Input id="NNSinput" placeholder="输入要查询的NSS域名" onChange={this.handelChange.bind(this)} defaultValue={this.state.inputValue}/> */}
             <Input placeholder="输入NSS域名" onChange={(e)=>{this.props.store.updateNNS(e.target.value)}} defaultValue={this.props.store.nns}/>
             <Button onClick={this.butGetInvokeReadClick} type="primary">获取NNS所有者信息</Button>
-            <pre>{this.state.resData}</pre>
+            <Card
+                hoverable = {true}
+                loading = {this.state.isloading}
+                title="NNS OwnerInfo"
+                style={{ width: 700 }}
+                >
+                <p><b>owner: </b>{this.state.resData.owner}</p>
+                <p><b>register scripthash: </b>{this.state.resData.register}</p>
+                <p><b>resolver scripthash: </b>{this.state.resData.resolver}</p>
+                <p><b>TTL: </b>{this.state.resData.TTL}</p>
+                <p><b>parentOwner: </b>{this.state.resData.parentOwner}</p>
+                <p><b>domain: </b>{this.state.resData.domain}</p>
+                <p><b>parenthash: </b>{this.state.resData.parenthash}</p>
+                <p><b>root: </b>{this.state.resData.root}</p>
+                <Tag color="#f50" visible={this.state.isExpired}>已过期！！！</Tag>
+            </Card>
+            {/* <pre>{this.state.resData}</pre> */}
         </>
         )    
     }

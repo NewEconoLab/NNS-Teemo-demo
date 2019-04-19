@@ -6,14 +6,12 @@ import {Button,Input} from 'antd';
 import { async } from 'q';
 import { any, number } from 'prop-types';
 import NeoHelper from '../Tools/neoHelper'
-import NNSHelper from '../Tools/nnsHelper'
 
 import {inject,observer} from 'mobx-react';
 
 @inject("store")
 @observer
 class DivDefault extends React.Component<any,any> {
-    NNSh = new NNSHelper(this.props.store);
 
     state = {
       resData : '{}'
