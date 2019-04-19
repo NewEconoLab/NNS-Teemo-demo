@@ -29,7 +29,8 @@ class Store {
             NEP_5_CGAS:"74f2dc36a68fdc4682034178eb2220729231db76",
             NEP_5_NNC:"fc732edee1efdf968c23c20a9628eaa5a6ccb934",
             NFT_test_O3Foundry:"7fe1d36ed60846975e70ec8b6fc0bef08b033107",
-            NFT_test_HashPuppies:"e7b2046b2412c4c7f1531ce144a73d47c3b272fe"
+            NFT_test_HashPuppies:"e7b2046b2412c4c7f1531ce144a73d47c3b272fe",
+            NEL_NFT_Test:"1dec715db5de0db0b2c54864aef32e5e30f0eddb"//"f4198fd80b5ca9d38984fc8dc2acbe7e49d6c00e"
         }
     } 
 

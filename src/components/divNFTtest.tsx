@@ -15,7 +15,7 @@ const { TextArea } = Input;
 @observer
 class DivNFTtest extends React.Component<any,any> {
     state={
-        NFTscripthash:this.props.store.scriptHash.NFT_test_O3Foundry,
+        NFTscripthash:this.props.store.scriptHash.NEL_NFT_Test,
         resData : '{}',
         name:'',
         symbol:'',
@@ -49,7 +49,7 @@ class DivNFTtest extends React.Component<any,any> {
         }],
         addr_from:'ASBhJFN3XiDu38EdEQyMY3N2XwGh1gd5WW',
         addr_to:'AeaWf2v7MHGpzxH4TtBAu5kJRp5mRq2DQG',
-        tokenID:18,
+        tokenID:1,
         reqDataWrite:'{}',
         resDataWrite:'{}',
         loadingW:false,
@@ -97,7 +97,7 @@ class DivNFTtest extends React.Component<any,any> {
             inputs.group.push(JSON.parse(JSON.stringify(input)))
         });
 
-        console.log(JSON.stringify(inputs,null,2))
+        //console.log(JSON.stringify(inputs,null,2))
 
         let result:any = await Teemo.NEO.invokeReadGroup(JSON.parse(JSON.stringify(inputs))) as InvokeReadGroup
 
@@ -115,6 +115,8 @@ class DivNFTtest extends React.Component<any,any> {
         //if(NFTDataArray.length>=50) NFTDataArray.pop()
 
         let totalSupply = parseInt('0x' + result.stack[3].value)
+        //console.log(totalSupply)
+
         for (var i=1;i<=totalSupply;i++)
         {
             let tokenResult =await this.getTokenInfo(i)
@@ -129,8 +131,8 @@ class DivNFTtest extends React.Component<any,any> {
             // resData:JSON.stringify(result,null,2),
             name:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[0].value),
             symbol:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[1].value),
-            supportedStandards:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[2].value),//.replace('80010006','')),
-            totalSupply:parseInt('0x' + result.stack[3].value),
+            supportedStandards:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[2].value[0].value),//.replace('80010006','')),
+            totalSupply:totalSupply,
             tokens:NFTDataArray,
             loadingR:false
         })
@@ -161,11 +163,13 @@ class DivNFTtest extends React.Component<any,any> {
         //console.log(JSON.stringify(result,null,2))
 
         let allowanceStr = result.stack[0].value
-        let allowance1 = allowanceStr.substr(0,40)
-        if(allowance1.length>0) allowance1 = await Teemo.NEO.TOOLS.getAddressFromScriptHash(allowance1)
-        let allowance2 = allowanceStr.substr(40)
-        if(allowance2.length>0) allowance2 = await Teemo.NEO.TOOLS.getAddressFromScriptHash(allowance2)
-        allowanceStr = allowance1 + " >>> " + allowance2
+        if(allowanceStr.length>0){
+            let allowance1 = allowanceStr.substr(0,40)
+            if(allowance1.length>0) allowance1 = await Teemo.NEO.TOOLS.getAddressFromScriptHash(allowance1)
+            let allowance2 = allowanceStr.substr(40)
+            if(allowance2.length>0) allowance2 = await Teemo.NEO.TOOLS.getAddressFromScriptHash(allowance2)
+            allowanceStr = allowance1 + " >>> " + allowance2
+        }
 
         this.setState({
             tempToken:{
@@ -174,7 +178,7 @@ class DivNFTtest extends React.Component<any,any> {
                 ownerOf:await Teemo.NEO.TOOLS.getAddressFromScriptHash(result.stack[1].value),
                 properties:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[2].value),
                 rwProperties:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[3].value),
-                token:result.stack[4].value,
+                token:JSON.stringify(result.stack[4].value),
                 uri:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[5].value) 
             }
         })
@@ -269,9 +273,9 @@ class DivNFTtest extends React.Component<any,any> {
             "scriptHash": this.state.NFTscripthash,
             "operation": "approve",
             "arguments": [
-                {"type":"Address","value":this.props.store.address},//owner 0
+                //{"type":"Address","value":this.props.store.address},//owner 0
                 {"type":"Address","value":this.state.addr_to},//t_spender 1
-                {"type":"Integer","value":18},//t_id 2
+                {"type":"Integer","value":this.state.tokenID},//t_id 2
                 {"type":"Boolean","value":false}//revoke 3
             ],
             "fee":"0",
@@ -287,9 +291,9 @@ class DivNFTtest extends React.Component<any,any> {
             "scriptHash": this.state.NFTscripthash,
             "operation": "approve",
             "arguments": [
-                {"type":"Address","value":this.props.store.address},//owner 0
+                //{"type":"Address","value":this.props.store.address},//owner 0
                 {"type":"Address","value":this.state.addr_to},//t_spender 1
-                {"type":"Integer","value":18},//t_id 2
+                {"type":"Integer","value":this.state.tokenID},//t_id 2
                 {"type":"Boolean","value":true}//revoke 3
             ],
             "fee":"0",
@@ -305,10 +309,10 @@ class DivNFTtest extends React.Component<any,any> {
             "scriptHash": this.state.NFTscripthash,
             "operation": "transferFrom",
             "arguments": [
-                {"type":"Address","value":this.props.store.address},//t_spender 0
-                {"type":"Address","value":this.state.addr_from},//t_from 1
+                //{"type":"Address","value":this.props.store.address},//t_spender 0
+                //{"type":"Address","value":this.state.addr_from},//t_from 1
                 {"type":"Address","value":this.state.addr_to},//t_to 2
-                {"type":"Integer","value":18}//tokenID 3
+                {"type":"Integer","value":this.state.tokenID}//tokenID 3
             ],
             "fee":"0",
             "description":"已授权NFT处置权的转移",
@@ -326,7 +330,7 @@ class DivNFTtest extends React.Component<any,any> {
                 // {"type":"Address","value":this.props.store.address},//t_spender 0
                 // {"type":"Address","value":this.state.addr_from},//t_from 1
                 {"type":"Address","value":this.state.addr_to},//t_to 0
-                {"type":"Integer","value":18}//tokenID 1
+                {"type":"Integer","value":this.state.tokenID}//tokenID 1
             ],
             "fee":"0",
             "description":"无授权NFT转移",
