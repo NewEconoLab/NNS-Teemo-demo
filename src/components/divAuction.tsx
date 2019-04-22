@@ -107,11 +107,11 @@ class DivAuction extends React.Component<any,any> {
 
     calcAuctionDay =async (blockIndex:number) =>{
         if(this.props.store.isTeemoReady){
-            var block = (await Teemo.NEO.getBlock({
-                "blockHeight": parseInt(blockIndex.toString()),  
+            var startTimeS = (await Teemo.NEO.getBlock({
+                "blockHeight": blockIndex,  
                 "network": this.props.store.network
-            })) as any
-            var startTimeS = block.time as number
+            })).time 
+            // var startTimeS = block.time as number
             return  (new Date().getTime()/1000 - startTimeS)/ 60 / this.props.store.auctionMinPerDay  //每天分钟数
         }
         else{
@@ -230,13 +230,14 @@ class DivAuction extends React.Component<any,any> {
             CGASBalance = await this.getDecimalsStrFromAssetAmount(CGASBalance,this.props.store.scriptHash.NEP_5_CGAS)           
             auctionBalance = await Teemo.NEO.TOOLS.getBigIntegerFromHexstr(auctionBalance)
             auctionBalance = await this.getDecimalsStrFromAssetAmount(auctionBalance,this.props.store.scriptHash.NEP_5_CGAS)
-            if(bidBalance.length>0){
+            console.log(typeof(bidBalance), bidBalance)
+            // if(bidBalance.length>0){
                 bidBalance = await Teemo.NEO.TOOLS.getBigIntegerFromHexstr(bidBalance)
                 bidBalance = await this.getDecimalsStrFromAssetAmount(bidBalance,this.props.store.scriptHash.NEP_5_CGAS)
-            }
-            else{
-                bidBalance = '0'
-            }
+            // }
+            // else{
+            //     bidBalance = '0'
+            // }
 
             this.setState({
                 CGASBalance:CGASBalance,

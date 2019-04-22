@@ -19,6 +19,7 @@ class DivNFTtest extends React.Component<any,any> {
         resData : '{}',
         name:'',
         symbol:'',
+        isOpen:'',
         supportedStandards:'',
         totalSupply:0,
         balanceOf:0,
@@ -36,7 +37,8 @@ class DivNFTtest extends React.Component<any,any> {
             properties:'',
             rwProperties:'',
             token:'',
-            uri:''
+            uri:'',
+            tokenData:''
         },
         tokens:[{
             tokenID:0,
@@ -45,8 +47,10 @@ class DivNFTtest extends React.Component<any,any> {
             properties:'',
             rwProperties:'',
             token:'',
-            uri:''
+            uri:'',
+            tokenData:''
         }],
+        tokenIDsOfOwner:'{}',
         addr_from:'ASBhJFN3XiDu38EdEQyMY3N2XwGh1gd5WW',
         addr_to:'AeaWf2v7MHGpzxH4TtBAu5kJRp5mRq2DQG',
         tokenID:1,
@@ -90,7 +94,7 @@ class DivNFTtest extends React.Component<any,any> {
         let inputs = {group:[{}]}
         inputs.group.pop()
 
-        let operations = ['name','symbol','supportedStandards','totalSupply']
+        let operations = ['name','symbol','supportedStandards','totalSupply','isOpen']
 
         operations.forEach(operation => {
             input.operation = operation
@@ -133,6 +137,7 @@ class DivNFTtest extends React.Component<any,any> {
             symbol:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[1].value),
             supportedStandards:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[2].value[0].value),//.replace('80010006','')),
             totalSupply:totalSupply,
+            isOpen:result.stack[4].value,
             tokens:NFTDataArray,
             loadingR:false
         })
@@ -152,7 +157,7 @@ class DivNFTtest extends React.Component<any,any> {
 
         let inputs = {group:[{}]}
         inputs.group.pop()
-        let operations = ['allowance','ownerOf','properties','rwProperties','token','uri']
+        let operations = ['allowance','ownerOf','properties','rwProperties','token','uri','token']
         operations.forEach(operation => {
             input.operation = operation
             inputs.group.push(JSON.parse(JSON.stringify(input)))
@@ -179,7 +184,8 @@ class DivNFTtest extends React.Component<any,any> {
                 properties:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[2].value),
                 rwProperties:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[3].value),
                 token:JSON.stringify(result.stack[4].value),
-                uri:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[5].value) 
+                uri:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[5].value),
+                tokenData: result.stack[6].value
             }
         })
 
@@ -190,7 +196,8 @@ class DivNFTtest extends React.Component<any,any> {
             properties:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[2].value),
             rwProperties:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[3].value),
             token:result.stack[4].value,
-            uri:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[5].value) 
+            uri:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[5].value),
+            tokenData: result.stack[6].value
         }
     }
 
@@ -213,10 +220,10 @@ class DivNFTtest extends React.Component<any,any> {
     getTokensOfOwner = async () =>{
         let input = {
             scriptHash: this.state.NFTscripthash,
-            operation: "tokensOfOwner",
+            operation: "tokenIDsOfOwner",
             arguments: [
                 {"type":"Address","value":this.props.store.address},
-                {"type":"Integer","value":1}
+                // {"type":"Integer","value":1}
             ],
             network: this.props.store.network
         }
@@ -224,8 +231,8 @@ class DivNFTtest extends React.Component<any,any> {
         let result:any = await Teemo.NEO.invokeRead(JSON.parse(JSON.stringify(input))) as InvokeReadInput
 
         this.setState({
-            // resData:JSON.stringify(result,null,2),
-            // balanceOf:result.stack[0].value
+            //resData:JSON.stringify(result,null,2)
+            tokenIDsOfOwner:JSON.stringify(result,null,2)
         })
     }
 
@@ -266,6 +273,38 @@ class DivNFTtest extends React.Component<any,any> {
         }
 
         this.doInvoke(invoke_doMintToken)
+    }
+
+    doModifyURI = async() =>{
+        let invoke_doModifyURI = {
+            "scriptHash": this.state.NFTscripthash,
+            "operation": "modifyURI",
+            "arguments": [
+                {"type":"Integer","value":this.state.tempToken.tokenID},//tokenID 1
+                {"type":"String","value":this.state.tempToken.uri},//URI 3 
+            ],
+            "fee":"0",
+            "description":"修改NFT URI",
+            "network": this.props.store.network
+        }
+
+        this.doInvoke(invoke_doModifyURI)
+    }
+
+    doSetRWProperties = async() =>{
+        let invoke_doSetRWProperties = {
+            "scriptHash": this.state.NFTscripthash,
+            "operation": "setRWProperties",
+            "arguments": [
+                {"type":"Integer","value":this.state.tempToken.tokenID},//tokenID 1
+                {"type":"String","value":this.state.tempToken.rwProperties},//URI 3 
+            ],
+            "fee":"0",
+            "description":"修改NFT 可变属性",
+            "network": this.props.store.network
+        }
+
+        this.doInvoke(invoke_doSetRWProperties)
     }
 
     doApprove = async() =>{
@@ -350,7 +389,7 @@ class DivNFTtest extends React.Component<any,any> {
                     <Card
                         style={{ width: 350 }}
                         cover={<img alt="URI" src={token.uri} />}
-                        actions={[<Icon type="setting" />, <Icon type="edit" />]}
+                        actions={[<Icon type="link" onClick={this.doModifyURI} />, <Icon type="edit" onClick={this.doSetRWProperties}/>]}
                     >
                         <Meta
                         avatar={<Avatar src="http://erc721.org/assets/img/721_cover.gif" />}
@@ -358,7 +397,8 @@ class DivNFTtest extends React.Component<any,any> {
                         description={token.properties}
                         />
                         <p>{token.ownerOf}</p>
-                        <TextArea value={token.rwProperties} autosize ></TextArea>
+                        <TextArea value={token.uri} autosize onChange={(e)=>{token.uri=e.target.value; this.setState({tempToken:token})}}></TextArea>
+                        <TextArea value={token.rwProperties} autosize onChange={(e)=>{token.rwProperties=e.target.value; this.setState({tempToken:token})}}></TextArea>
                     </Card>
                 </div>
             )
@@ -419,6 +459,7 @@ class DivNFTtest extends React.Component<any,any> {
                 <p>symbol:{this.state.symbol}</p>
                 <p>supportedStandards:{this.state.supportedStandards}</p>
                 <p>totalSupply:{this.state.totalSupply}</p>
+                <p>isOpen:{this.state.isOpen}</p>
                 <p>balanceOf({this.props.store.address}):{this.state.balanceOf}</p>
                 <List
                 itemLayout="vertical"
@@ -437,7 +478,8 @@ class DivNFTtest extends React.Component<any,any> {
                     properties:string,
                     rwProperties:string,
                     token:string,
-                    uri:string
+                    uri:string,
+                    tokenData:string
                 }) => (
                     <List.Item 
                         key={item.tokenID}
@@ -455,6 +497,8 @@ class DivNFTtest extends React.Component<any,any> {
                         properties:{item.properties}
                         <br />
                         rwProperties:{item.rwProperties}
+                        {/* <br />
+                        tokenData:<pre>{JSON.stringify(item.tokenData,null,2)}</pre> */}
                     </div>
                     </List.Item>
                 )}
