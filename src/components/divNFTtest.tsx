@@ -9,6 +9,8 @@ import { any, number } from 'prop-types';
 import {inject,observer} from 'mobx-react';
 import Item, { Meta } from 'antd/lib/list/Item';
 
+import './index.less'
+
 const { TextArea } = Input;
 
 @inject("store")
@@ -455,7 +457,7 @@ class DivNFTtest extends React.Component<any,any> {
                 <pre>{this.state.resDataWrite}</pre>
             </Spin>
             <Spin tip='等待共识中' spinning={this.state.loadingR}>
-                <p>name:{this.state.name}</p>
+                <p className="test">name:{this.state.name}</p>
                 <p>symbol:{this.state.symbol}</p>
                 <p>supportedStandards:{this.state.supportedStandards}</p>
                 <p>totalSupply:{this.state.totalSupply}</p>
