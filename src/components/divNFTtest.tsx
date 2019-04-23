@@ -1,5 +1,5 @@
 import {
-    List, message, Avatar, Spin, InputNumber,
+    List, message, Avatar, Spin, InputNumber, Switch, Modal,
   } from 'antd';
 import React, { Component } from 'react';
 import {Button,Input,Divider,Drawer,Popover,Card,Icon} from 'antd';
@@ -21,8 +21,8 @@ class DivNFTtest extends React.Component<any,any> {
         resData : '{}',
         name:'',
         symbol:'',
-        isOpen:'',
-        supportedStandards:'',
+        isOpen:true,
+        supportedStandards:[''],
         totalSupply:0,
         balanceOf:0,
         newToken:{
@@ -130,6 +130,14 @@ class DivNFTtest extends React.Component<any,any> {
             if(i>=30) break;
         }
         
+        var supportedStandardsV = ['']
+        var supportedStandards = result.stack[2].value
+        supportedStandardsV.pop()
+        supportedStandards.forEach(async (supportedStandard: any) => {
+            var str = await Teemo.NEO.TOOLS.getStringFromHexstr(supportedStandard.value)
+            supportedStandardsV.push(str)
+        });
+
         // result = result.stack[0].value
         // result = NeoHelper.hexToString(result)
         // console.log(result)
@@ -137,9 +145,9 @@ class DivNFTtest extends React.Component<any,any> {
             // resData:JSON.stringify(result,null,2),
             name:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[0].value),
             symbol:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[1].value),
-            supportedStandards:await Teemo.NEO.TOOLS.getStringFromHexstr(result.stack[2].value[0].value),//.replace('80010006','')),
+            supportedStandards:supportedStandardsV,//.replace('80010006','')),
             totalSupply:totalSupply,
-            isOpen:result.stack[4].value,
+            isOpen:result.stack[4].value==1?true:false,
             tokens:NFTDataArray,
             loadingR:false
         })
@@ -309,6 +317,38 @@ class DivNFTtest extends React.Component<any,any> {
         this.doInvoke(invoke_doSetRWProperties)
     }
 
+    doSetProperties = async() =>{
+        if(this.props.store.address=='AeaWf2v7MHGpzxH4TtBAu5kJRp5mRq2DQG')
+        {
+            let invoke_doSetProperties = {
+                "scriptHash": this.state.NFTscripthash,
+                "operation": "setProperties",
+                "arguments": [
+                    {"type":"Integer","value":this.state.tempToken.tokenID},//tokenID 1
+                    {"type":"String","value":this.state.tempToken.properties},//URI 3 
+                ],
+                "fee":"0",
+                "description":"修改NFT 不可变属性（仅管理员）",
+                "network": this.props.store.network
+            }
+    
+            this.doInvoke(invoke_doSetProperties)
+        }
+        else
+        {
+            Modal.warning({
+                title: '警告',
+                content: (
+                  <div>
+                    <p>你不是合约管理员！</p>
+                  </div>
+                ),
+                onOk() {},
+              });
+            // alert('你不是合约管理员！')
+        }
+    }
+
     doApprove = async() =>{
         let invoke_doApprove =  {
             "scriptHash": this.state.NFTscripthash,
@@ -381,6 +421,70 @@ class DivNFTtest extends React.Component<any,any> {
         this.doInvoke(invoke_doTransfer)
     } 
 
+    
+    doSetName =()=>{
+        let invoke_doSetName = {
+            "scriptHash": this.state.NFTscripthash,
+            "operation": "setName",
+            "arguments": [
+                {"type":"String","value":this.state.name},
+            ],
+            "fee":"0",
+            "description":"设置name（仅管理员）",
+            "network": this.props.store.network
+        }
+
+        this.doInvoke(invoke_doSetName)
+    } 
+
+    doSetSymbol =()=>{
+        let invoke_doSetSymbol = {
+            "scriptHash": this.state.NFTscripthash,
+            "operation": "setSymbol",
+            "arguments": [
+                {"type":"String","value":this.state.symbol},
+            ],
+            "fee":"0",
+            "description":"设置symbol（仅管理员）",
+            "network": this.props.store.network
+        }
+
+        this.doInvoke(invoke_doSetSymbol)
+    } 
+
+    doSetSupportedStandards =()=>{
+        let invoke_doSetSupportedStandards = {
+            "scriptHash": this.state.NFTscripthash,
+            "operation": "setSupportedStandards",
+            "arguments": [
+                {"type":"Array","value":[]},
+            ],
+            "fee":"0",
+            "description":"设置supportedStandards（仅管理员）",
+            "network": this.props.store.network
+        }
+        this.state.supportedStandards.forEach(supportedStandard => {
+            ((invoke_doSetSupportedStandards.arguments as Argument[])[0].value as Argument[]).push({type:"String",value:supportedStandard});
+        });
+
+        this.doInvoke(invoke_doSetSupportedStandards)
+    } 
+
+    doSetIsOpen =()=>{
+        let invoke_doSetIsOpen = {
+            "scriptHash": this.state.NFTscripthash,
+            "operation": "setIsOpen",
+            "arguments": [
+                {"type":"Boolean","value":!this.state.isOpen},
+            ],
+            "fee":"0",
+            "description":"设置isOpen（仅管理员）",
+            "network": this.props.store.network
+        }  
+
+        this.doInvoke(invoke_doSetIsOpen)
+    } 
+
     viewTokenContent =(index:number)=>{
         if(this.state.tokens[0].tokenID != 0 && index>0){
             // index--
@@ -391,7 +495,7 @@ class DivNFTtest extends React.Component<any,any> {
                     <Card
                         style={{ width: 350 }}
                         cover={<img alt="URI" src={token.uri} />}
-                        actions={[<Icon type="link" onClick={this.doModifyURI} />, <Icon type="edit" onClick={this.doSetRWProperties}/>]}
+                        actions={[<Icon type="tool" onClick={this.doSetProperties} />,<Icon type="link" onClick={this.doModifyURI} />, <Icon type="edit" onClick={this.doSetRWProperties}/>]}
                     >
                         <Meta
                         avatar={<Avatar src="http://erc721.org/assets/img/721_cover.gif" />}
@@ -399,6 +503,7 @@ class DivNFTtest extends React.Component<any,any> {
                         description={token.properties}
                         />
                         <p>{token.ownerOf}</p>
+                        <TextArea value={token.properties} autosize onChange={(e)=>{token.properties=e.target.value; this.setState({tempToken:token})}}></TextArea>
                         <TextArea value={token.uri} autosize onChange={(e)=>{token.uri=e.target.value; this.setState({tempToken:token})}}></TextArea>
                         <TextArea value={token.rwProperties} autosize onChange={(e)=>{token.rwProperties=e.target.value; this.setState({tempToken:token})}}></TextArea>
                     </Card>
@@ -457,12 +562,45 @@ class DivNFTtest extends React.Component<any,any> {
                 <pre>{this.state.resDataWrite}</pre>
             </Spin>
             <Spin tip='等待共识中' spinning={this.state.loadingR}>
-                <p className="test">name:{this.state.name}</p>
+                <table className="greenTable">
+                <tbody>
+                    <tr>
+                        <th>key</th>
+                        <th>value</th>
+                    </tr>
+                    <tr>
+                        <td>name</td>
+                        <td>{this.state.name}</td>
+                    </tr>
+                    <tr className="alt">
+                        <td>symbol</td>
+                        <td>{this.state.symbol}</td>
+                    </tr>
+                    <tr>
+                        <td>supportedStandards</td>
+                        <td>{JSON.stringify(this.state.supportedStandards)}</td>
+                    </tr> 
+                    <tr className="alt">
+                        <td>totalSupply</td>
+                        <td>{this.state.totalSupply}</td>
+                    </tr> 
+                    <tr>
+                        <td>isOpen</td>
+                        <td>{<Switch checked={this.state.isOpen}  onChange={this.doSetIsOpen} />}</td>
+                        {/* <td>{this.state.isOpen?"true":"false"}</td> */}
+                    </tr>
+                    <tr className="alt">
+                        <td>balanceOf({this.props.store.address})</td>
+                        <td>{this.state.balanceOf}</td>
+                    </tr> 
+                </tbody>                    
+                </table>
+                {/* <p className="test">name:{this.state.name}</p>
                 <p>symbol:{this.state.symbol}</p>
                 <p>supportedStandards:{this.state.supportedStandards}</p>
                 <p>totalSupply:{this.state.totalSupply}</p>
-                <p>isOpen:{this.state.isOpen}</p>
-                <p>balanceOf({this.props.store.address}):{this.state.balanceOf}</p>
+                <p>isOpen:{this.state.isOpen}</p> */}
+                {/* <p>balanceOf({this.props.store.address}):{this.state.balanceOf}</p> */}
                 <List
                 itemLayout="vertical"
                 bordered = {true}
