@@ -13,6 +13,7 @@ import DivNnsResolver from './components/divNnsResolver';
 import DivAuction from './components/divAuction';
 import DivNnsCredit from './components/divNnsCredit';
 import DivNFTtest from './components/divNFTtest';
+import DivNFTDEX from './components/divNFTDEX';
 
 const store = new Store();
 
@@ -26,6 +27,7 @@ ReactDOM.render(
                                 <Route path="/nnsauction" component={DivAuction}/>
                                 <Route path="/nnscredit" component={DivNnsCredit}/>
                                 <Route path="/nfttest" component={DivNFTtest}/>
+                                <Route path='/nftdex' component={DivNFTDEX} />
                         </App>
                 </BrowserRouter>
         </Provider>
